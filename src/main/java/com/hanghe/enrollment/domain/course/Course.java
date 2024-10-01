@@ -4,9 +4,7 @@ import com.hanghe.enrollment.common.BaseTimeEntity;
 import com.hanghe.enrollment.domain.enrollment.Enrollment;
 import com.hanghe.enrollment.domain.user.professor.Professor;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class Course extends BaseTimeEntity {
     @Id @GeneratedValue
     @Column(name = "course_id")
@@ -30,9 +29,24 @@ public class Course extends BaseTimeEntity {
     private CourseStatus status;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
+    @ToString.Exclude
     private List<Enrollment> enrollments = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name="professor_id")
     private Professor professor;
+
+    @Builder
+    public Course(
+            Long id,
+            String title,
+            CourseTime courseTime,
+            Professor professor
+    ) {
+        this.id = id;
+        this.title = title;
+        this.courseTime = courseTime;
+        this.status = CourseStatus.OPEN;
+        this.professor = professor;
+    }
 }
