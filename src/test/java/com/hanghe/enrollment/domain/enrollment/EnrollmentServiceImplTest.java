@@ -4,6 +4,7 @@ import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseDate;
 import com.hanghe.enrollment.domain.course.CourseTime;
 import com.hanghe.enrollment.domain.course.dto.CourseDateRequestDto;
+import com.hanghe.enrollment.domain.enrollment.dto.EnrollmentDto;
 import com.hanghe.enrollment.domain.user.UserInfo;
 import com.hanghe.enrollment.domain.user.professor.Professor;
 import com.hanghe.enrollment.domain.user.student.Student;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -72,6 +74,7 @@ class EnrollmentServiceImplTest {
 
     private Enrollment enrollment_1;
     private Enrollment enrollment_2;
+    private EnrollmentDto.applyRequest applyRequest;
 
     @BeforeEach
     void setUp() {
@@ -181,6 +184,11 @@ class EnrollmentServiceImplTest {
                 .course(course_2)
                 .student(student_1)
                 .build();
+
+        applyRequest = EnrollmentDto.applyRequest.builder()
+                .courseId(COURSE_1_ID)
+                .userId(STUDENT_1_ID)
+                .build();
     }
 
     @Test
@@ -191,5 +199,17 @@ class EnrollmentServiceImplTest {
         List<Enrollment> enrollments = enrollmentService.getEnrollment(STUDENT_1_ID);
 
         assertThat(enrollments).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("주어진 신청자 식별자와 강의 식별자로 신청 내역을 생성하고 반환한다.")
+    void createWithExistedUserIdAndExistedCourseId() {
+        given(enrollmentRepository.save(any(Enrollment.class))).willReturn(enrollment_1);
+
+        Enrollment createdEnrollment = enrollmentService.apply(applyRequest);
+
+        assertThat(createdEnrollment.getId()).isEqualTo(ENROLLMENT_1_ID);
+        assertThat(createdEnrollment.getCourse().getId()).isEqualTo(COURSE_1_ID);
+        assertThat(createdEnrollment.getStudent().getId()).isEqualTo(STUDENT_1_ID);
     }
 }
