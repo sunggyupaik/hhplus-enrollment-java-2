@@ -1,5 +1,6 @@
 package com.hanghe.enrollment.domain.course.dto;
 
+import com.hanghe.enrollment.domain.course.CourseDate;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,5 +22,13 @@ public class CourseDateRequestDto {
         this.year = year;
         this.month = month;
         this.day = day;
+    }
+
+    public CourseDate toCourseDate() {
+        return CourseDate.builder()
+                .year(year)
+                .month(month)
+                .day(day)
+                .build();
     }
 }

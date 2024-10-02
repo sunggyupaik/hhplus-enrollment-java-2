@@ -23,12 +23,15 @@ public class Course extends BaseTimeEntity {
     private String title;
 
     @Embedded
+    private CourseDate courseDate;
+
+    @Embedded
     private CourseTime courseTime;
 
     @Enumerated(EnumType.STRING)
     private CourseStatus status;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
+    @OneToMany(mappedBy = "course")
     @ToString.Exclude
     private List<Enrollment> enrollments = new ArrayList<>();
 
@@ -40,11 +43,13 @@ public class Course extends BaseTimeEntity {
     public Course(
             Long id,
             String title,
+            CourseDate courseDate,
             CourseTime courseTime,
             Professor professor
     ) {
         this.id = id;
         this.title = title;
+        this.courseDate = courseDate;
         this.courseTime = courseTime;
         this.status = CourseStatus.OPEN;
         this.professor = professor;

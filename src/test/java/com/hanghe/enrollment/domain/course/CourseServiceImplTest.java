@@ -28,9 +28,14 @@ class CourseServiceImplTest {
     private static final String PROFESSOR_2_EMAIL = "2@naver.com";
     private static final String PROFESSOR_2_PHONE = "01022222222";
 
+    private static final Integer YEAR = 2024;
+    private static final Integer MONTH = 10;
+    private static final Integer DAY = 31;
+
     private static final Long COURSE_1_ID = 1L;
-    private static final Long COURSE_2_ID = 2L;
     private static final String COURSE_1_TITLE = "코스1 특강";
+
+    private static final Long COURSE_2_ID = 2L;
     private static final String COURSE_2_TITLE = "코스2 특강";
 
     private Professor professor_1;
@@ -40,15 +45,17 @@ class CourseServiceImplTest {
 
     private CourseDateRequestDto courseDateRequestDto;
     private CourseTime courseTime_1;
-    private CourseTime courseTime_2;
+    private CourseDate courseDate_1;
     private Course course_1;
+
+    private CourseTime courseTime_2;
+    private CourseDate courseDate_2;
     private Course course_2;
 
     @BeforeEach
     void setUp() {
         courseRepository = mock(JpaCourseRepository.class);
         courseService = new CourseServiceImpl(courseRepository);
-
 
         professorUserInfo_1 = UserInfo.builder()
                 .name(PROFESSOR_1_NAME)
@@ -73,28 +80,21 @@ class CourseServiceImplTest {
                 .build();
 
         courseDateRequestDto = CourseDateRequestDto.builder()
-                .year(2024)
-                .month(10)
-                .day(31)
+                .year(YEAR)
+                .month(MONTH)
+                .day(DAY)
+                .build();
+
+        courseDate_1 = CourseDate.builder()
+                .year(YEAR)
+                .month(MONTH)
+                .day(DAY)
                 .build();
 
         courseTime_1 = CourseTime.builder()
-                .year(2024)
-                .month(10)
-                .day(31)
                 .startTime(12)
                 .startMinute(0)
                 .endTime(14)
-                .endMinute(0)
-                .build();
-
-        courseTime_2 = CourseTime.builder()
-                .year(2024)
-                .month(10)
-                .day(31)
-                .startTime(14)
-                .startMinute(0)
-                .endTime(16)
                 .endMinute(0)
                 .build();
 
@@ -103,6 +103,19 @@ class CourseServiceImplTest {
                 .title(COURSE_1_TITLE)
                 .courseTime(courseTime_1)
                 .professor(professor_1)
+                .build();
+
+        courseDate_2 = CourseDate.builder()
+                .year(YEAR)
+                .month(MONTH)
+                .day(DAY)
+                .build();
+
+        courseTime_2 = CourseTime.builder()
+                .startTime(14)
+                .startMinute(0)
+                .endTime(16)
+                .endMinute(0)
                 .build();
 
         course_2 = Course.builder()
@@ -116,7 +129,7 @@ class CourseServiceImplTest {
     @Test
     @DisplayName("주어진 특정 날짜로 특강 목록을 조회하여 반환한다")
     void listCoursesWithCourseTime() {
-        given(courseRepository.findAllByCourseTime(courseDateRequestDto)).willReturn(List.of(course_1, course_2));
+        given(courseRepository.findAllByCourseDate(courseDate_1)).willReturn(List.of(course_1, course_2));
 
         List<Course> courses = courseService.findAllByDate(courseDateRequestDto);
 

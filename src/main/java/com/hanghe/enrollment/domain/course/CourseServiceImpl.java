@@ -13,6 +13,6 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<Course> findAllByDate(CourseDateRequestDto request) {
-        return courseRepository.findAllByCourseTime(request);
+        return courseRepository.findAllByCourseDate(request.toCourseDate());
     }
 }

@@ -6,13 +6,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Embeddable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CourseTime {
-    private Integer year;
-    private Integer month;
-    private Integer day;
     private Integer startTime;
     private Integer startMinute;
     private Integer endTime;
@@ -20,20 +19,30 @@ public class CourseTime {
 
     @Builder
     public CourseTime(
-            Integer year,
-            Integer month,
-            Integer day,
             Integer startTime,
             Integer startMinute,
             Integer endTime,
             Integer endMinute
     ) {
-        this.year = year;
-        this.month = month;
-        this.day = day;
         this.startTime = startTime;
         this.startMinute = startMinute;
         this.endTime = endTime;
         this.endMinute = endMinute;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CourseTime that = (CourseTime) o;
+        return Objects.equals(getStartTime(), that.getStartTime())
+                && Objects.equals(getStartMinute(), that.getStartMinute())
+                && Objects.equals(getEndTime(), that.getEndTime())
+                && Objects.equals(getEndMinute(), that.getEndMinute());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getStartTime(), getStartMinute(), getEndTime(), getEndMinute());
     }
 }
