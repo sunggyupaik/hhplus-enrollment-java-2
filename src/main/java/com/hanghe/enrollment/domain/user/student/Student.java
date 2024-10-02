@@ -4,6 +4,7 @@ import com.hanghe.enrollment.domain.enrollment.Enrollment;
 import com.hanghe.enrollment.domain.user.UserInfo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +23,12 @@ public class Student {
     @Embedded
     private UserInfo userInfo;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "student")
     private List<Enrollment> enrollments = new ArrayList<>();
+
+    @Builder
+    public Student(Long id, UserInfo userInfo) {
+        this.id = id;
+        this.userInfo = userInfo;
+    }
 }
