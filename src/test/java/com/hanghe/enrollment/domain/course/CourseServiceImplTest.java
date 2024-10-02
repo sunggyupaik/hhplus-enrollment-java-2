@@ -28,9 +28,9 @@ class CourseServiceImplTest {
     private static final String PROFESSOR_2_EMAIL = "2@naver.com";
     private static final String PROFESSOR_2_PHONE = "01022222222";
 
-    private static final Integer YEAR = 2024;
-    private static final Integer MONTH = 10;
-    private static final Integer DAY = 31;
+    private static final Integer YEAR_2024 = 2024;
+    private static final Integer MONTH_10 = 10;
+    private static final Integer DAY_31 = 31;
 
     private static final Long COURSE_1_ID = 1L;
     private static final String COURSE_1_TITLE = "코스1 특강";
@@ -51,6 +51,9 @@ class CourseServiceImplTest {
     private CourseTime courseTime_2;
     private CourseDate courseDate_2;
     private Course course_2;
+
+    private CourseDateRequestDto courseDateRequestDto_none;
+    private CourseDate courseDate_none;
 
     @BeforeEach
     void setUp() {
@@ -80,15 +83,15 @@ class CourseServiceImplTest {
                 .build();
 
         courseDateRequestDto = CourseDateRequestDto.builder()
-                .year(YEAR)
-                .month(MONTH)
-                .day(DAY)
+                .year(YEAR_2024)
+                .month(MONTH_10)
+                .day(DAY_31)
                 .build();
 
         courseDate_1 = CourseDate.builder()
-                .year(YEAR)
-                .month(MONTH)
-                .day(DAY)
+                .year(YEAR_2024)
+                .month(MONTH_10)
+                .day(DAY_31)
                 .build();
 
         courseTime_1 = CourseTime.builder()
@@ -106,9 +109,9 @@ class CourseServiceImplTest {
                 .build();
 
         courseDate_2 = CourseDate.builder()
-                .year(YEAR)
-                .month(MONTH)
-                .day(DAY)
+                .year(YEAR_2024)
+                .month(MONTH_10)
+                .day(DAY_31)
                 .build();
 
         courseTime_2 = CourseTime.builder()
@@ -124,15 +127,37 @@ class CourseServiceImplTest {
                 .courseTime(courseTime_2)
                 .professor(professor_2)
                 .build();
+
+        courseDateRequestDto_none = CourseDateRequestDto.builder()
+                .year(9999)
+                .month(12)
+                .day(31)
+                .build();
+
+        courseDate_none = CourseDate.builder()
+                .year(9999)
+                .month(12)
+                .day(31)
+                .build();
     }
 
     @Test
     @DisplayName("주어진 특정 날짜로 특강 목록을 조회하여 반환한다")
-    void listCoursesWithCourseTime() {
+    void listCoursesWithCourseDate() {
         given(courseRepository.findAllByCourseDate(courseDate_1)).willReturn(List.of(course_1, course_2));
 
         List<Course> courses = courseService.findAllByDate(courseDateRequestDto);
 
         assertThat(courses).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("주어진 특정 날짜에 특강이 없으면 빈 리스트를 반환한다.")
+    void listEmptyCoursesWithNotExistedDate() {
+        given(courseRepository.findAllByCourseDate(courseDate_none)).willReturn(List.of());
+
+        List<Course> courses = courseService.findAllByDate(courseDateRequestDto_none);
+
+        assertThat(courses).hasSize(0);
     }
 }
