@@ -5,6 +5,7 @@ import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.user.student.Student;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,13 @@ public class Enrollment extends BaseTimeEntity {
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private Student user;
+    @JoinColumn(name = "student_id")
+    private Student student;
+
+    @Builder
+    public Enrollment(Long id, Course course, Student student) {
+        this.id = id;
+        this.course = course;
+        this.student = student;
+    }
 }
