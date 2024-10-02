@@ -9,4 +9,6 @@ import java.util.List;
 public interface JpaEnrollmentRepository
         extends EnrollmentRepository, JpaRepository<Enrollment, Long> {
     List<Enrollment> findByStudentId(Long studentId);
+
+    Enrollment save(Enrollment enrollment);
 }
