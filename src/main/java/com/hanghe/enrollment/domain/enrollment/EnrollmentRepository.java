@@ -6,4 +6,6 @@ public interface EnrollmentRepository {
     List<Enrollment> findByStudentId(Long studentId);
 
     Enrollment save(Enrollment enrollment);
+
+    List<Enrollment> findAll();
 }

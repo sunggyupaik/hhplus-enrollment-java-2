@@ -7,12 +7,14 @@ import com.hanghe.enrollment.domain.course.CourseFixture;
 import com.hanghe.enrollment.domain.course.CourseReader;
 import com.hanghe.enrollment.domain.course.CourseRepository;
 import com.hanghe.enrollment.domain.course.option.CourseDate;
+import com.hanghe.enrollment.domain.course.option.CourseOptionReader;
 import com.hanghe.enrollment.domain.course.option.CourseOptionRepository;
 import com.hanghe.enrollment.domain.course.option.CourseTime;
 import com.hanghe.enrollment.domain.user.UserInfo;
 import com.hanghe.enrollment.domain.user.UserInfoFixture;
 import com.hanghe.enrollment.domain.user.professor.Professor;
 import com.hanghe.enrollment.domain.user.professor.ProfessorFixture;
+import com.hanghe.enrollment.infrastructure.course.option.CourseOptionReaderImpl;
 import com.hanghe.enrollment.interfaces.course.option.CourseOptionFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +28,7 @@ import static org.mockito.Mockito.mock;
 
 class CourseReaderImplTest {
     private CourseReader courseReader;
+    private CourseOptionReader courseOptionReader;
     private CourseOptionRepository courseOptionRepository;
     private CourseRepository courseRepository;
 
@@ -53,6 +56,7 @@ class CourseReaderImplTest {
 
         courseRepository = mock(CourseRepository.class);
         courseOptionRepository = mock(CourseOptionRepository.class);
+        courseOptionReader = new CourseOptionReaderImpl(courseOptionRepository);
         courseReader = new CourseReaderImpl(courseRepository, courseOptionRepository);
 
         courseDate_1 = CourseOptionFixture.createCourseDate(2024, 10, 31);
@@ -74,10 +78,11 @@ class CourseReaderImplTest {
     @Test
     @DisplayName("주어진 식별자에 해당하는 특강 옵션이 없으면 찾을 수 없다는 예외를 반환한다.")
     void getCourseWithNotExistedCourseOptionId_throwsNotFoundException() {
-        given(courseRepository.findById(COURSE_1_ID)).willReturn(Optional.of(course_1));
+        given(courseOptionRepository.findByIdForPessimistLock(COURSE_1_ID, NOT_EXISTED_COURSE_OPTION_ID))
+                .willReturn(Optional.empty());
 
         assertThatThrownBy(
-                () -> courseReader.getCourse(COURSE_1_ID, NOT_EXISTED_COURSE_OPTION_ID)
+                () -> courseOptionReader.getByIdForPessimistLock(COURSE_1_ID, NOT_EXISTED_COURSE_OPTION_ID)
         )
                 .isInstanceOf(CourseOptionNotFoundException.class);
     }

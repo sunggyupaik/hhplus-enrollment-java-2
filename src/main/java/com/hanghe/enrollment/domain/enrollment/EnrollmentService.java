@@ -8,4 +8,6 @@ public interface EnrollmentService {
     List<EnrollmentDto.Response> getEnrollments(Long studentId);
 
     EnrollmentDto.Response apply(Long studentId, Long courseId, Long courseOptionId);
+
+    List<Enrollment> lists();
 }

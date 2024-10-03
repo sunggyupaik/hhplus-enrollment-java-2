@@ -11,4 +11,6 @@ public interface JpaEnrollmentRepository
     List<Enrollment> findByStudentId(Long studentId);
 
     Enrollment save(Enrollment enrollment);
+
+    List<Enrollment> findAll();
 }

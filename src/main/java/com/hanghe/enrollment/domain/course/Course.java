@@ -27,7 +27,7 @@ public class Course extends BaseTimeEntity {
     @ToString.Exclude
     private List<Enrollment> enrollments = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "professor_id")
     @ToString.Exclude
     private Professor professor;
