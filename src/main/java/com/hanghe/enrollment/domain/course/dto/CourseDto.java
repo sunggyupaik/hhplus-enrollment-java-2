@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CourseDto {
     @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor
     public static class CourseDateRequest {
         private Integer year;
         private Integer month;
@@ -39,7 +39,7 @@ public class CourseDto {
     @Getter
     @Builder
     @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor
     public static class Response {
         private Long id;
         private Professor professor;

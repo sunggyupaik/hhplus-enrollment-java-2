@@ -2,8 +2,14 @@ package com.hanghe.enrollment.domain.course;
 
 import com.hanghe.enrollment.domain.course.dto.CourseDto;
 import com.hanghe.enrollment.domain.course.dto.CourseDto.CourseDateRequest;
+import com.hanghe.enrollment.domain.course.option.CourseDate;
+import com.hanghe.enrollment.domain.course.option.CourseOption;
+import com.hanghe.enrollment.domain.course.option.CourseTime;
 import com.hanghe.enrollment.domain.user.UserInfo;
+import com.hanghe.enrollment.domain.user.UserInfoFixture;
 import com.hanghe.enrollment.domain.user.professor.Professor;
+import com.hanghe.enrollment.domain.user.professor.ProfessorFixture;
+import com.hanghe.enrollment.interfaces.course.option.CourseOptionFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,9 +39,12 @@ class CourseServiceImplTest {
     private static final Integer DAY_31 = 31;
 
     private static final Long COURSE_1_ID = 1L;
+    private static final Long COURSE_OPTION_1_1_ID = 50L;
+    private static final Long COURSE_OPTION_1_2_ID = 52L;
     private static final String COURSE_1_TITLE = "코스1 특강";
 
     private static final Long COURSE_2_ID = 2L;
+    private static final Long COURSE_OPTION_2_ID = 51L;
     private static final String COURSE_2_TITLE = "코스2 특강";
 
     private Professor professor_1;
@@ -43,15 +52,18 @@ class CourseServiceImplTest {
     private Professor professor_2;
     private UserInfo professorUserInfo_2;
 
-    private CourseDateRequest courseDateRequest;
+    private CourseOption courseOption_1_1;
+    private CourseOption courseOption_1_2;
     private CourseTime courseTime_1;
     private CourseDate courseDate_1;
     private Course course_1;
 
+    private CourseOption courseOption_2;
     private CourseTime courseTime_2;
     private CourseDate courseDate_2;
     private Course course_2;
 
+    private CourseDto.CourseDateRequest courseDateRequest;
     private CourseDateRequest courseDateRequest_none;
     private CourseDate courseDate_none;
 
@@ -60,83 +72,39 @@ class CourseServiceImplTest {
         courseReader = mock(CourseReader.class);
         courseService = new CourseServiceImpl(courseReader);
 
-        professorUserInfo_1 = UserInfo.builder()
-                .name(PROFESSOR_1_NAME)
-                .email(PROFESSOR_1_EMAIL)
-                .phone(PROFESSOR_1_PHONE)
-                .build();
+        professorUserInfo_1 = UserInfoFixture.createUserInfo(PROFESSOR_1_NAME, PROFESSOR_1_EMAIL, PROFESSOR_1_PHONE);
+        professor_1 = ProfessorFixture.createProfessor(PROFESSOR_1_ID, professorUserInfo_1);
 
-        professor_1 = Professor.builder()
-                .id(PROFESSOR_1_ID)
-                .userInfo(professorUserInfo_1)
-                .build();
+        professorUserInfo_2 = UserInfoFixture.createUserInfo(PROFESSOR_2_NAME, PROFESSOR_2_EMAIL, PROFESSOR_2_PHONE);
+        professor_2 = ProfessorFixture.createProfessor(PROFESSOR_2_ID, professorUserInfo_2);
 
-        professorUserInfo_2 = UserInfo.builder()
-                .name(PROFESSOR_2_NAME)
-                .email(PROFESSOR_2_EMAIL)
-                .phone(PROFESSOR_2_PHONE)
-                .build();
+        courseDate_1 = CourseOptionFixture.createCourseDate(YEAR_2024, MONTH_10, DAY_31);
+        courseTime_1 = CourseOptionFixture.createCourseTime(12, 0, 14, 0);
+        courseOption_1_1 = CourseOptionFixture.createCourseOption(COURSE_OPTION_1_1_ID, courseDate_1, courseTime_1);
+        courseOption_1_2 = CourseOptionFixture.createCourseOption(COURSE_OPTION_1_2_ID, courseDate_1, courseTime_2);
+        course_1 = CourseFixture.createCourse(COURSE_1_ID, COURSE_1_TITLE, professor_1);
+        course_1.addCourseOption(courseOption_1_1);
+        course_1.addCourseOption(courseOption_1_2);
 
-        professor_2 = Professor.builder()
-                .id(PROFESSOR_2_ID)
-                .userInfo(professorUserInfo_2)
-                .build();
+        courseDate_2 = CourseOptionFixture.createCourseDate(YEAR_2024, MONTH_10, DAY_31);
+        courseTime_2 = CourseOptionFixture.createCourseTime(14, 0, 16, 0);
+        courseOption_2 = CourseOptionFixture.createCourseOption(COURSE_OPTION_2_ID, courseDate_2, courseTime_2);
+        course_2 = CourseFixture.createCourse(COURSE_2_ID, COURSE_2_TITLE, professor_2);
+        course_2.addCourseOption(courseOption_2);
 
-        courseDateRequest = CourseDateRequest.builder()
+        courseDateRequest = CourseDto.CourseDateRequest.builder()
                 .year(YEAR_2024)
                 .month(MONTH_10)
                 .day(DAY_31)
                 .build();
 
-        courseDate_1 = CourseDate.builder()
-                .year(YEAR_2024)
-                .month(MONTH_10)
-                .day(DAY_31)
-                .build();
-
-        courseTime_1 = CourseTime.builder()
-                .startTime(12)
-                .startMinute(0)
-                .endTime(14)
-                .endMinute(0)
-                .build();
-
-        course_1 = Course.builder()
-                .id(COURSE_1_ID)
-                .title(COURSE_1_TITLE)
-                .courseDate(courseDate_1)
-                .courseTime(courseTime_1)
-                .professor(professor_1)
-                .build();
-
-        courseDate_2 = CourseDate.builder()
-                .year(YEAR_2024)
-                .month(MONTH_10)
-                .day(DAY_31)
-                .build();
-
-        courseTime_2 = CourseTime.builder()
-                .startTime(14)
-                .startMinute(0)
-                .endTime(16)
-                .endMinute(0)
-                .build();
-
-        course_2 = Course.builder()
-                .id(COURSE_2_ID)
-                .title(COURSE_2_TITLE)
-                .courseDate(courseDate_2)
-                .courseTime(courseTime_2)
-                .professor(professor_2)
-                .build();
-
-        courseDateRequest_none = CourseDateRequest.builder()
+        courseDate_none = CourseDate.builder()
                 .year(9999)
                 .month(12)
                 .day(31)
                 .build();
 
-        courseDate_none = CourseDate.builder()
+        courseDateRequest_none = CourseDateRequest.builder()
                 .year(9999)
                 .month(12)
                 .day(31)
@@ -146,13 +114,19 @@ class CourseServiceImplTest {
     @Test
     @DisplayName("주어진 특정 날짜로 특강 목록을 조회하여 반환한다")
     void listCoursesWithCourseDate() {
-        given(courseReader.getCourses(courseDate_1)).willReturn(List.of(course_1, course_2));
+        given(courseReader.getCourses(courseDate_1))
+                .willReturn(
+                        List.of(CourseDto.Response.of(course_1, List.of(courseOption_1_1, courseOption_1_2)),
+                                CourseDto.Response.of(course_2, List.of(courseOption_2)))
+                );
 
         List<CourseDto.Response> courses = courseService.list(courseDateRequest);
 
         assertThat(courses).hasSize(2);
         assertThat(courses.get(0).getId()).isEqualTo(COURSE_1_ID);
         assertThat(courses.get(0).getProfessor().getId()).isEqualTo(PROFESSOR_1_ID);
+        assertThat(courses.get(0).getCourseOptions().get(0).getId()).isEqualTo(COURSE_OPTION_1_1_ID);
+        assertThat(courses.get(0).getCourseOptions().get(1).getId()).isEqualTo(COURSE_OPTION_1_2_ID);
     }
 
     @Test

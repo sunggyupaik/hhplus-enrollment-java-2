@@ -21,7 +21,7 @@ public class Student {
     @Embedded
     private UserInfo userInfo;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "student")
+    @OneToMany(mappedBy = "student", cascade = CascadeType.PERSIST)
     @ToString.Exclude
     private List<Enrollment> enrollments = new ArrayList<>();
 

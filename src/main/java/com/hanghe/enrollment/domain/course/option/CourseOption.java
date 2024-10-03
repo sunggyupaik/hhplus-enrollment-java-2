@@ -28,6 +28,7 @@ public class CourseOption {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
+    @ToString.Exclude
     private Course course;
 
     @Builder

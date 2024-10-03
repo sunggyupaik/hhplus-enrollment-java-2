@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,9 +15,6 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional(readOnly = true)
     public List<CourseDto.Response> list(CourseDto.CourseDateRequest request) {
-        List<Course> courses = courseReader.getCourses(request.toCourseDate());
-
-        return courses.stream().map(CourseDto.Response::of)
-                .collect(Collectors.toList());
+        return courseReader.getCourses(request.toCourseDate());
     }
 }

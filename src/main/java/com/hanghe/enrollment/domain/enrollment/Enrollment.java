@@ -4,14 +4,12 @@ import com.hanghe.enrollment.common.BaseTimeEntity;
 import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.user.student.Student;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class Enrollment extends BaseTimeEntity {
     @Id
     @GeneratedValue
@@ -19,10 +17,12 @@ public class Enrollment extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="course_id")
+    @ToString.Exclude
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
+    @ToString.Exclude
     private Student student;
 
     @Builder
