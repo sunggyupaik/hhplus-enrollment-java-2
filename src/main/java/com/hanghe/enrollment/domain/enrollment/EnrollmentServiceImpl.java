@@ -43,6 +43,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
         Enrollment enrollment = Enrollment.builder()
                 .course(course)
+                .courseOption(lockedCourseOption)
                 .student(student)
                 .build();
 

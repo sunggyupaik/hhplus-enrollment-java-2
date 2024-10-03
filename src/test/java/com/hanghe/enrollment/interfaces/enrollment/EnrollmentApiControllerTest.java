@@ -125,8 +125,8 @@ class EnrollmentApiControllerTest {
         courseOption_2 = CourseOptionFixture.createCourseOption(COURSE_OPTION_2_ID, courseDate_2, courseTime_2);
         course_2 = CourseFixture.createCourse(COURSE_2_ID, COURSE_2_TITLE, professor_2);
 
-        enrollment_1 = EnrollmentFixture.createEnrollment(ENROLLMENT_1_ID, course_1, student_1);
-        enrollment_2 = EnrollmentFixture.createEnrollment(ENROLLMENT_2_ID, course_2, student_1);
+        enrollment_1 = EnrollmentFixture.createEnrollment(ENROLLMENT_1_ID, course_1, courseOption_1, student_1);
+        enrollment_2 = EnrollmentFixture.createEnrollment(ENROLLMENT_2_ID, course_2, courseOption_2, student_1);
 
         responses = List.of(
                 EnrollmentDto.Response.of(enrollment_1),

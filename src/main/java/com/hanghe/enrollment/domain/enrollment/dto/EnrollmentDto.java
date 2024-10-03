@@ -1,6 +1,7 @@
 package com.hanghe.enrollment.domain.enrollment.dto;
 
 import com.hanghe.enrollment.domain.course.Course;
+import com.hanghe.enrollment.domain.course.option.CourseOption;
 import com.hanghe.enrollment.domain.enrollment.Enrollment;
 import com.hanghe.enrollment.domain.user.student.Student;
 import lombok.*;
@@ -29,6 +30,7 @@ public class EnrollmentDto {
     @ToString
     public static class Response {
         private Long id;
+        private CourseOption courseOption;
         private Student student;
         private Course course;
 
@@ -36,6 +38,7 @@ public class EnrollmentDto {
             return Response.builder()
                     .id(enrollment.getId())
                     .student(enrollment.getStudent())
+                    .courseOption(enrollment.getCourseOption())
                     .course(enrollment.getCourse())
                     .build();
         }
