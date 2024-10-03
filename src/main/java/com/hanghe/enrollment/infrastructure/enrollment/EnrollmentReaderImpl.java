@@ -22,4 +22,9 @@ public class EnrollmentReaderImpl implements EnrollmentReader {
     public List<Enrollment> lists() {
         return enrollmentRepository.findAll();
     }
+
+    @Override
+    public boolean exists(Long studentId, Long courseId, Long courseOptionId) {
+        return enrollmentRepository.exists(studentId, courseId, courseOptionId);
+    }
 }

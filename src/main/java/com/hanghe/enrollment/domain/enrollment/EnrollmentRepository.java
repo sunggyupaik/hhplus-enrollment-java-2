@@ -8,4 +8,6 @@ public interface EnrollmentRepository {
     Enrollment save(Enrollment enrollment);
 
     List<Enrollment> findAll();
+
+    boolean exists(Long studentId, Long courseId, Long courseOptionId);
 }
