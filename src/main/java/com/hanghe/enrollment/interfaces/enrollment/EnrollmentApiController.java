@@ -13,13 +13,16 @@ import java.util.List;
 public class EnrollmentApiController {
     private final EnrollmentFacade enrollmentFacade;
 
-    @GetMapping("/{id}")
+    @GetMapping("/user/{id}")
     public List<EnrollmentDto.Response> listEnrollments(@PathVariable("id") Long studentId) {
         return enrollmentFacade.listEnrollments(studentId);
     }
 
     @PostMapping("/apply/course/{courseId}/student/{studentId}")
-    public EnrollmentDto.Response createEnrollment(@PathVariable Long courseId, @PathVariable Long studentId) {
+    public EnrollmentDto.Response createEnrollment(
+            @PathVariable("courseId") Long courseId,
+            @PathVariable("studentId") Long studentId
+    ) {
         return enrollmentFacade.createEnrollment(courseId, studentId);
     }
 }
