@@ -4,7 +4,7 @@ import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseDate;
 import com.hanghe.enrollment.domain.course.CourseRepository;
 import com.hanghe.enrollment.domain.course.CourseTime;
-import com.hanghe.enrollment.domain.course.dto.CourseDateRequestDto;
+import com.hanghe.enrollment.domain.course.dto.CourseDto;
 import com.hanghe.enrollment.domain.user.UserInfo;
 import com.hanghe.enrollment.domain.user.professor.Professor;
 import com.hanghe.enrollment.infrastructure.professor.JpaProfessorRepository;
@@ -39,7 +39,7 @@ class JpaCourseRepositoryTest {
     private static final Long COURSE_1_ID = 1L;
     private static final String COURSE_1_TITLE = "코스1 특강";
 
-    private CourseDateRequestDto courseDateRequestDto;
+    private CourseDto.CourseDateRequest courseDateRequest;
 
     private Professor professor_1;
     private UserInfo professorUserInfo_1;
@@ -51,7 +51,7 @@ class JpaCourseRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        courseDateRequestDto = CourseDateRequestDto.builder()
+        courseDateRequest = CourseDto.CourseDateRequest.builder()
                 .year(2024)
                 .month(10)
                 .day(31)
