@@ -214,7 +214,7 @@ class EnrollmentServiceImplTest {
     void getEnrollmentsWithExistedStudentId() {
         given(enrollmentReader.getEnrollments(STUDENT_1_ID)).willReturn(List.of(enrollment_1, enrollment_2));
 
-        List<Enrollment> enrollments = enrollmentService.getEnrollments(STUDENT_1_ID);
+        List<EnrollmentDto.Response> enrollments = enrollmentService.getEnrollments(STUDENT_1_ID);
 
         assertThat(enrollments).hasSize(2);
         assertThat(enrollments.get(0).getCourse().getId()).isEqualTo(COURSE_1_ID);
@@ -227,7 +227,7 @@ class EnrollmentServiceImplTest {
     void getEnrollmentsWithNotExistedStudentId() {
         given(enrollmentReader.getEnrollments(NOT_EXISTED_STUDENT_ID)).willReturn(List.of());
 
-        List<Enrollment> enrollments = enrollmentService.getEnrollments(NOT_EXISTED_STUDENT_ID);
+        List<EnrollmentDto.Response> enrollments = enrollmentService.getEnrollments(NOT_EXISTED_STUDENT_ID);
 
         assertThat(enrollments).hasSize(0);
     }

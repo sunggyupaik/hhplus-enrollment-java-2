@@ -3,10 +3,7 @@ package com.hanghe.enrollment.domain.user.student;
 import com.hanghe.enrollment.domain.enrollment.Enrollment;
 import com.hanghe.enrollment.domain.user.UserInfo;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +11,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class Student {
     @Id
     @GeneratedValue
@@ -24,6 +22,7 @@ public class Student {
     private UserInfo userInfo;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "student")
+    @ToString.Exclude
     private List<Enrollment> enrollments = new ArrayList<>();
 
     @Builder
