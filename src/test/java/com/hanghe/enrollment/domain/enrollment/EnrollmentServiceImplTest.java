@@ -2,23 +2,23 @@ package com.hanghe.enrollment.domain.enrollment;
 
 import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseDate;
-import com.hanghe.enrollment.domain.course.CourseRepository;
+import com.hanghe.enrollment.domain.course.CourseReader;
 import com.hanghe.enrollment.domain.course.CourseTime;
 import com.hanghe.enrollment.domain.course.dto.CourseDateRequestDto;
 import com.hanghe.enrollment.domain.enrollment.dto.EnrollmentDto;
 import com.hanghe.enrollment.domain.user.UserInfo;
 import com.hanghe.enrollment.domain.user.professor.Professor;
 import com.hanghe.enrollment.domain.user.student.Student;
-import com.hanghe.enrollment.domain.user.student.StudentRepository;
-import com.hanghe.enrollment.infrastructure.course.JpaCourseRepository;
-import com.hanghe.enrollment.infrastructure.enrollment.JpaEnrollmentRepository;
-import com.hanghe.enrollment.infrastructure.student.JpaStudentRepository;
+import com.hanghe.enrollment.domain.user.student.StudentReader;
+import com.hanghe.enrollment.infrastructure.course.CourseReaderImpl;
+import com.hanghe.enrollment.infrastructure.enrollment.EnrollmentReaderImpl;
+import com.hanghe.enrollment.infrastructure.enrollment.EnrollmentStoreImpl;
+import com.hanghe.enrollment.infrastructure.student.StudentReaderImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,9 +27,10 @@ import static org.mockito.Mockito.mock;
 
 class EnrollmentServiceImplTest {
     private EnrollmentService enrollmentService;
-    private EnrollmentRepository enrollmentRepository;
-    private CourseRepository courseRepository;
-    private StudentRepository studentRepository;
+    private EnrollmentReader enrollmentReader;
+    private EnrollmentStore enrollmentStore;
+    private CourseReader courseReader;
+    private StudentReader studentReader;
 
     private static final Long STUDENT_1_ID = 20L;
     private static final String STUDENT_1_NAME = "신청자1";
@@ -85,10 +86,13 @@ class EnrollmentServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        enrollmentRepository = mock(JpaEnrollmentRepository.class);
-        courseRepository = mock(JpaCourseRepository.class);
-        studentRepository = mock(JpaStudentRepository.class);
-        enrollmentService = new EnrollmentServiceImpl(enrollmentRepository, courseRepository, studentRepository);
+        enrollmentReader = mock(EnrollmentReaderImpl.class);
+        enrollmentStore = mock(EnrollmentStoreImpl.class);
+        courseReader = mock(CourseReaderImpl.class);
+        studentReader = mock(StudentReaderImpl.class);
+        enrollmentService = new EnrollmentServiceImpl(
+                enrollmentReader, enrollmentStore, courseReader,studentReader
+        );
 
         studentUserInfo_1 = UserInfo.builder()
                 .name(STUDENT_1_NAME)
@@ -203,9 +207,9 @@ class EnrollmentServiceImplTest {
     @Test
     @DisplayName("주어진 신청자 식별자에 해당하는 신청 내역 목록을 조회하여 반환한다.")
     void detailWithExistedUserId() {
-        given(enrollmentRepository.findByStudentId(STUDENT_1_ID)).willReturn(List.of(enrollment_1, enrollment_2));
+        given(enrollmentReader.getEnrollments(STUDENT_1_ID)).willReturn(List.of(enrollment_1, enrollment_2));
 
-        List<Enrollment> enrollments = enrollmentService.getEnrollment(STUDENT_1_ID);
+        List<Enrollment> enrollments = enrollmentService.getEnrollments(STUDENT_1_ID);
 
         assertThat(enrollments).hasSize(2);
     }
@@ -213,9 +217,9 @@ class EnrollmentServiceImplTest {
     @Test
     @DisplayName("주어진 신청자 식별자와 강의 식별자로 신청 내역을 생성하고 반환한다.")
     void createWithExistedUserIdAndExistedCourseId() {
-        given(studentRepository.findById(STUDENT_1_ID)).willReturn(Optional.of(student_1));
-        given(courseRepository.findById(COURSE_1_ID)).willReturn(Optional.of(course_1));
-        given(enrollmentRepository.save(any(Enrollment.class))).willReturn(enrollment_1);
+        given(studentReader.getStudent(STUDENT_1_ID)).willReturn(student_1);
+        given(courseReader.getCourse(COURSE_1_ID)).willReturn(course_1);
+        given(enrollmentStore.store(any(Enrollment.class))).willReturn(enrollment_1);
 
         Enrollment createdEnrollment = enrollmentService.apply(applyRequest);
 
