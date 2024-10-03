@@ -2,6 +2,7 @@ package com.hanghe.enrollment.domain.enrollment;
 
 import com.hanghe.enrollment.common.BaseTimeEntity;
 import com.hanghe.enrollment.domain.course.Course;
+import com.hanghe.enrollment.domain.course.option.CourseOption;
 import com.hanghe.enrollment.domain.user.student.Student;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,14 +22,20 @@ public class Enrollment extends BaseTimeEntity {
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="course_option_id")
+    @ToString.Exclude
+    private CourseOption courseOption;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     @ToString.Exclude
     private Student student;
 
     @Builder
-    public Enrollment(Long id, Course course, Student student) {
+    public Enrollment(Long id, Course course, CourseOption courseOption, Student student) {
         this.id = id;
         this.course = course;
+        this.courseOption = courseOption;
         this.student = student;
     }
 }

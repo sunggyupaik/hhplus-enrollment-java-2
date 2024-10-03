@@ -134,8 +134,8 @@ class EnrollmentServiceImplTest {
         course_2 = CourseFixture.createCourse(COURSE_2_ID, COURSE_2_TITLE, professor_2);
         course_2.addCourseOption(courseOption_2);
 
-        enrollment_1 = EnrollmentFixture.createEnrollment(ENROLLMENT_1_ID, course_1, student_1);
-        enrollment_2 = EnrollmentFixture.createEnrollment(ENROLLMENT_2_ID, course_2, student_1);
+        enrollment_1 = EnrollmentFixture.createEnrollment(ENROLLMENT_1_ID, course_1, courseOption_1, student_1);
+        enrollment_2 = EnrollmentFixture.createEnrollment(ENROLLMENT_2_ID, course_2, courseOption_2, student_1);
 
         courseDateRequest_none = CourseDateRequest.builder()
                 .year(9999)
@@ -191,6 +191,7 @@ class EnrollmentServiceImplTest {
         assertThat(createdEnrollment.getId()).isEqualTo(ENROLLMENT_1_ID);
         assertThat(createdEnrollment.getCourse().getId()).isEqualTo(COURSE_1_ID);
         assertThat(createdEnrollment.getStudent().getId()).isEqualTo(STUDENT_1_ID);
+        assertThat(createdEnrollment.getCourseOption().getId()).isEqualTo(COURSE_OPTION_1_ID);
     }
 
     @Test
