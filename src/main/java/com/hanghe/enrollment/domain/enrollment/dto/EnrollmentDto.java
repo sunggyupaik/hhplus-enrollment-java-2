@@ -23,7 +23,7 @@ public class EnrollmentDto {
     @Getter
     @Builder
     @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor
     @ToString
     public static class Response {
         private Long id;

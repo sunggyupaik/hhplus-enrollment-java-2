@@ -23,15 +23,16 @@ public class Course extends BaseTimeEntity {
 
     private String title;
 
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.PERSIST)
     @ToString.Exclude
     private List<Enrollment> enrollments = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "professor_id")
+    @ToString.Exclude
     private Professor professor;
 
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.PERSIST)
     @ToString.Exclude
     private List<CourseOption> courseOptions = new ArrayList<>();
 
@@ -49,5 +50,9 @@ public class Course extends BaseTimeEntity {
     public void addCourseOption(CourseOption courseOption) {
         this.courseOptions.add(courseOption);
         courseOption.changeCourse(this);
+    }
+
+    public void changeProfessor(Professor professor) {
+        this.professor = professor;
     }
 }

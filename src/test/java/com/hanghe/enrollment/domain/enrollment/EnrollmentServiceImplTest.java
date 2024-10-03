@@ -3,19 +3,26 @@ package com.hanghe.enrollment.domain.enrollment;
 import com.hanghe.enrollment.common.exception.CourseNotFoundException;
 import com.hanghe.enrollment.common.exception.StudentNotFoundException;
 import com.hanghe.enrollment.domain.course.Course;
-import com.hanghe.enrollment.domain.course.CourseDate;
+import com.hanghe.enrollment.domain.course.CourseFixture;
 import com.hanghe.enrollment.domain.course.CourseReader;
-import com.hanghe.enrollment.domain.course.CourseTime;
 import com.hanghe.enrollment.domain.course.dto.CourseDto.CourseDateRequest;
+import com.hanghe.enrollment.domain.course.option.CourseDate;
+import com.hanghe.enrollment.domain.course.option.CourseOption;
+import com.hanghe.enrollment.domain.course.option.CourseTime;
 import com.hanghe.enrollment.domain.enrollment.dto.EnrollmentDto;
 import com.hanghe.enrollment.domain.user.UserInfo;
+import com.hanghe.enrollment.domain.user.UserInfoFixture;
 import com.hanghe.enrollment.domain.user.professor.Professor;
+import com.hanghe.enrollment.domain.user.professor.ProfessorFixture;
 import com.hanghe.enrollment.domain.user.student.Student;
+import com.hanghe.enrollment.domain.user.student.StudentFixture;
 import com.hanghe.enrollment.domain.user.student.StudentReader;
 import com.hanghe.enrollment.infrastructure.course.CourseReaderImpl;
 import com.hanghe.enrollment.infrastructure.enrollment.EnrollmentReaderImpl;
 import com.hanghe.enrollment.infrastructure.enrollment.EnrollmentStoreImpl;
 import com.hanghe.enrollment.infrastructure.student.StudentReaderImpl;
+import com.hanghe.enrollment.interfaces.course.option.CourseOptionFixture;
+import com.hanghe.enrollment.interfaces.enrollment.EnrollmentFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,9 +64,11 @@ class EnrollmentServiceImplTest {
 
     private static final Long NOT_EXISTED_COURSE_ID = 998L;
     private static final Long COURSE_1_ID = 1L;
+    private static final Long COURSE_OPTION_1_ID = 50L;
     private static final String COURSE_1_TITLE = "코스1 특강";
 
     private static final Long COURSE_2_ID = 2L;
+    private static final Long COURSE_OPTION_2_ID = 51L;
     private static final String COURSE_2_TITLE = "코스2 특강";
 
     private static final Long ENROLLMENT_1_ID = 30L;
@@ -74,10 +83,12 @@ class EnrollmentServiceImplTest {
     private UserInfo professorUserInfo_2;
 
     private CourseDateRequest courseDateRequest;
+    private CourseOption courseOption_1;
     private CourseTime courseTime_1;
     private CourseDate courseDate_1;
     private Course course_1;
 
+    private CourseOption courseOption_2;
     private CourseTime courseTime_2;
     private CourseDate courseDate_2;
     private Course course_2;
@@ -99,85 +110,29 @@ class EnrollmentServiceImplTest {
                 enrollmentReader, enrollmentStore, courseReader,studentReader
         );
 
-        studentUserInfo_1 = UserInfo.builder()
-                .name(STUDENT_1_NAME)
-                .email(STUDENT_1_EMAIL)
-                .phone(STUDENT_1_PHONE)
-                .build();
+        studentUserInfo_1 = UserInfoFixture.createUserInfo(STUDENT_1_NAME, STUDENT_1_EMAIL, STUDENT_1_PHONE);
+        student_1 = StudentFixture.createStudent(STUDENT_1_ID, studentUserInfo_1);
 
-        student_1 = Student.builder()
-                .id(STUDENT_1_ID)
-                .userInfo(studentUserInfo_1)
-                .build();
+        professorUserInfo_1 = UserInfoFixture.createUserInfo(PROFESSOR_1_NAME, PROFESSOR_1_EMAIL, PROFESSOR_1_PHONE);
+        professor_1 = ProfessorFixture.createProfessor(PROFESSOR_1_ID, professorUserInfo_1);
 
+        professorUserInfo_2 = UserInfoFixture.createUserInfo(PROFESSOR_2_NAME, PROFESSOR_2_EMAIL, PROFESSOR_2_PHONE);
+        professor_2 = ProfessorFixture.createProfessor(PROFESSOR_2_ID, professorUserInfo_2);
 
-        professorUserInfo_1 = UserInfo.builder()
-                .name(PROFESSOR_1_NAME)
-                .email(PROFESSOR_1_EMAIL)
-                .phone(PROFESSOR_1_PHONE)
-                .build();
+        courseDate_1 = CourseOptionFixture.createCourseDate(YEAR_2024, MONTH_10, DAY_31);
+        courseTime_1 = CourseOptionFixture.createCourseTime(12, 0, 14, 0);
+        courseOption_1 = CourseOptionFixture.createCourseOption(COURSE_OPTION_1_ID, courseDate_1, courseTime_1);
+        course_1 = CourseFixture.createCourse(COURSE_1_ID, COURSE_1_TITLE, professor_1);
+        course_1.addCourseOption(courseOption_1);
 
-        professor_1 = Professor.builder()
-                .id(PROFESSOR_1_ID)
-                .userInfo(professorUserInfo_1)
-                .build();
+        courseDate_2 = CourseOptionFixture.createCourseDate(YEAR_2024, MONTH_10, DAY_31);
+        courseTime_2 = CourseOptionFixture.createCourseTime(14, 0, 16, 0);
+        courseOption_2 = CourseOptionFixture.createCourseOption(COURSE_OPTION_2_ID, courseDate_2, courseTime_2);
+        course_2 = CourseFixture.createCourse(COURSE_2_ID, COURSE_2_TITLE, professor_2);
+        course_2.addCourseOption(courseOption_2);
 
-        professorUserInfo_2 = UserInfo.builder()
-                .name(PROFESSOR_2_NAME)
-                .email(PROFESSOR_2_EMAIL)
-                .phone(PROFESSOR_2_PHONE)
-                .build();
-
-        professor_2 = Professor.builder()
-                .id(PROFESSOR_2_ID)
-                .userInfo(professorUserInfo_2)
-                .build();
-
-        courseDateRequest = CourseDateRequest.builder()
-                .year(YEAR_2024)
-                .month(MONTH_10)
-                .day(DAY_31)
-                .build();
-
-        courseDate_1 = CourseDate.builder()
-                .year(YEAR_2024)
-                .month(MONTH_10)
-                .day(DAY_31)
-                .build();
-
-        courseTime_1 = CourseTime.builder()
-                .startTime(12)
-                .startMinute(0)
-                .endTime(14)
-                .endMinute(0)
-                .build();
-
-        course_1 = Course.builder()
-                .id(COURSE_1_ID)
-                .title(COURSE_1_TITLE)
-                .courseTime(courseTime_1)
-                .professor(professor_1)
-                .build();
-
-        courseDate_2 = CourseDate.builder()
-                .year(YEAR_2024)
-                .month(MONTH_10)
-                .day(DAY_31)
-                .build();
-
-        courseTime_2 = CourseTime.builder()
-                .startTime(14)
-                .startMinute(0)
-                .endTime(16)
-                .endMinute(0)
-                .build();
-
-        course_2 = Course.builder()
-                .id(COURSE_2_ID)
-                .title(COURSE_2_TITLE)
-                .courseTime(courseTime_2)
-                .professor(professor_2)
-                .build();
+        enrollment_1 = EnrollmentFixture.createEnrollment(ENROLLMENT_1_ID, course_1, student_1);
+        enrollment_2 = EnrollmentFixture.createEnrollment(ENROLLMENT_2_ID, course_2, student_1);
 
         courseDateRequest_none = CourseDateRequest.builder()
                 .year(9999)
@@ -189,18 +144,6 @@ class EnrollmentServiceImplTest {
                 .year(9999)
                 .month(12)
                 .day(31)
-                .build();
-
-        enrollment_1 = Enrollment.builder()
-                .id(ENROLLMENT_1_ID)
-                .course(course_1)
-                .student(student_1)
-                .build();
-
-        enrollment_2 = Enrollment.builder()
-                .id(ENROLLMENT_2_ID)
-                .course(course_2)
-                .student(student_1)
                 .build();
 
         applyRequest = EnrollmentDto.applyRequest.builder()
@@ -249,11 +192,6 @@ class EnrollmentServiceImplTest {
     @Test
     @DisplayName("주어진 신청자 식별자가 존재하지 않으면 찾을 수 없다는 예외를 반환한다.")
     void createWithNotExistedStudentId_throwsNotFoundException() {
-        EnrollmentDto.applyRequest request = EnrollmentDto.applyRequest.builder()
-                .studentId(NOT_EXISTED_STUDENT_ID)
-                .courseId(COURSE_1_ID)
-                .build();
-
         given(studentReader.getStudent(NOT_EXISTED_STUDENT_ID)).willThrow(StudentNotFoundException.class);
 
         assertThatThrownBy(
@@ -265,11 +203,6 @@ class EnrollmentServiceImplTest {
     @Test
     @DisplayName("주어진 특강 식별자가 존재하지 않으면 찾을 수 없다는 예외를 반환한다.")
     void createWithNotExistedCourseId_throwsNotFoundException() {
-        EnrollmentDto.applyRequest request = EnrollmentDto.applyRequest.builder()
-                .studentId(STUDENT_1_ID)
-                .courseId(NOT_EXISTED_COURSE_ID)
-                .build();
-
         given(studentReader.getStudent(STUDENT_1_ID)).willReturn(student_1);
         given(courseReader.getCourse(NOT_EXISTED_COURSE_ID)).willThrow(CourseNotFoundException.class);
 
