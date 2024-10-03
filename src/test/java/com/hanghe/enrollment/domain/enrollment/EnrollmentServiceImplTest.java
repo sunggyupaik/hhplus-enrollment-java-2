@@ -1,5 +1,7 @@
 package com.hanghe.enrollment.domain.enrollment;
 
+import com.hanghe.enrollment.common.exception.CourseNotFoundException;
+import com.hanghe.enrollment.common.exception.StudentNotFoundException;
 import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseDate;
 import com.hanghe.enrollment.domain.course.CourseReader;
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -32,6 +35,7 @@ class EnrollmentServiceImplTest {
     private CourseReader courseReader;
     private StudentReader studentReader;
 
+    private static final Long NOT_EXISTED_STUDENT_ID = 999L;
     private static final Long STUDENT_1_ID = 20L;
     private static final String STUDENT_1_NAME = "신청자1";
     private static final String STUDENT_1_EMAIL = "신청자1@naver.com";
@@ -51,6 +55,7 @@ class EnrollmentServiceImplTest {
     private static final Integer MONTH_10 = 10;
     private static final Integer DAY_31 = 31;
 
+    private static final Long NOT_EXISTED_COURSE_ID = 998L;
     private static final Long COURSE_1_ID = 1L;
     private static final String COURSE_1_TITLE = "코스1 특강";
 
@@ -206,7 +211,7 @@ class EnrollmentServiceImplTest {
 
     @Test
     @DisplayName("주어진 신청자 식별자에 해당하는 신청 내역 목록을 조회하여 반환한다.")
-    void detailWithExistedUserId() {
+    void detailWithExistedStudentId() {
         given(enrollmentReader.getEnrollments(STUDENT_1_ID)).willReturn(List.of(enrollment_1, enrollment_2));
 
         List<Enrollment> enrollments = enrollmentService.getEnrollments(STUDENT_1_ID);
@@ -216,7 +221,7 @@ class EnrollmentServiceImplTest {
 
     @Test
     @DisplayName("주어진 신청자 식별자와 강의 식별자로 신청 내역을 생성하고 반환한다.")
-    void createWithExistedUserIdAndExistedCourseId() {
+    void createWithExistedStudentIdAndExistedCourseId() {
         given(studentReader.getStudent(STUDENT_1_ID)).willReturn(student_1);
         given(courseReader.getCourse(COURSE_1_ID)).willReturn(course_1);
         given(enrollmentStore.store(any(Enrollment.class))).willReturn(enrollment_1);
@@ -226,5 +231,38 @@ class EnrollmentServiceImplTest {
         assertThat(createdEnrollment.getId()).isEqualTo(ENROLLMENT_1_ID);
         assertThat(createdEnrollment.getCourse().getId()).isEqualTo(COURSE_1_ID);
         assertThat(createdEnrollment.getStudent().getId()).isEqualTo(STUDENT_1_ID);
+    }
+
+    @Test
+    @DisplayName("주어진 신청자 식별자가 존재하지 않으면 찾을 수 없다는 예외를 반환한다.")
+    void createWithNotExistedStudentId_throwsNotFoundException() {
+        EnrollmentDto.applyRequest request = EnrollmentDto.applyRequest.builder()
+                .studentId(NOT_EXISTED_STUDENT_ID)
+                .courseId(COURSE_1_ID)
+                .build();
+
+        given(studentReader.getStudent(NOT_EXISTED_STUDENT_ID)).willThrow(StudentNotFoundException.class);
+
+        assertThatThrownBy(
+                () -> enrollmentService.apply(request)
+        )
+                .isInstanceOf(StudentNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("주어진 특강 식별자가 존재하지 않으면 찾을 수 없다는 예외를 반환한다.")
+    void createWithNotExistedCourseId_throwsNotFoundException() {
+        EnrollmentDto.applyRequest request = EnrollmentDto.applyRequest.builder()
+                .studentId(STUDENT_1_ID)
+                .courseId(NOT_EXISTED_COURSE_ID)
+                .build();
+
+        given(studentReader.getStudent(STUDENT_1_ID)).willReturn(student_1);
+        given(courseReader.getCourse(NOT_EXISTED_COURSE_ID)).willThrow(CourseNotFoundException.class);
+
+        assertThatThrownBy(
+                () -> enrollmentService.apply(request)
+        )
+                .isInstanceOf(CourseNotFoundException.class);
     }
 }
