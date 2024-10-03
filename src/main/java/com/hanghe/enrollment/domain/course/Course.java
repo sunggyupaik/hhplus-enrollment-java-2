@@ -52,6 +52,12 @@ public class Course extends BaseTimeEntity {
         courseOption.changeCourse(this);
     }
 
+    public void setCourseOption(CourseOption courseOption) {
+        this.courseOptions = new ArrayList<>();
+        this.courseOptions.add(courseOption);
+        courseOption.changeCourse(this);
+    }
+
     public void changeProfessor(Professor professor) {
         this.professor = professor;
     }

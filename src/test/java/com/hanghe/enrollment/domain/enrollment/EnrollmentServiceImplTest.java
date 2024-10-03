@@ -1,6 +1,7 @@
 package com.hanghe.enrollment.domain.enrollment;
 
 import com.hanghe.enrollment.common.exception.CourseNotFoundException;
+import com.hanghe.enrollment.common.exception.CourseOptionNotFoundException;
 import com.hanghe.enrollment.common.exception.StudentNotFoundException;
 import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseFixture;
@@ -63,6 +64,7 @@ class EnrollmentServiceImplTest {
     private static final Integer DAY_31 = 31;
 
     private static final Long NOT_EXISTED_COURSE_ID = 998L;
+    private static final Long NOT_EXISTED_COURSE_OPTION_ID = 997L;
     private static final Long COURSE_1_ID = 1L;
     private static final Long COURSE_OPTION_1_ID = 50L;
     private static final String COURSE_1_TITLE = "코스1 특강";
@@ -182,7 +184,7 @@ class EnrollmentServiceImplTest {
         given(courseReader.getCourse(COURSE_1_ID)).willReturn(course_1);
         given(enrollmentStore.store(any(Enrollment.class))).willReturn(enrollment_1);
 
-        EnrollmentDto.Response createdEnrollment = enrollmentService.apply(COURSE_1_ID, STUDENT_1_ID);
+        EnrollmentDto.Response createdEnrollment = enrollmentService.apply(STUDENT_1_ID, COURSE_1_ID, COURSE_OPTION_1_ID);
 
         assertThat(createdEnrollment.getId()).isEqualTo(ENROLLMENT_1_ID);
         assertThat(createdEnrollment.getCourse().getId()).isEqualTo(COURSE_1_ID);
@@ -195,7 +197,7 @@ class EnrollmentServiceImplTest {
         given(studentReader.getStudent(NOT_EXISTED_STUDENT_ID)).willThrow(StudentNotFoundException.class);
 
         assertThatThrownBy(
-                () -> enrollmentService.apply(COURSE_1_ID, NOT_EXISTED_STUDENT_ID)
+                () -> enrollmentService.apply(NOT_EXISTED_STUDENT_ID, COURSE_1_ID, COURSE_OPTION_1_ID)
         )
                 .isInstanceOf(StudentNotFoundException.class);
     }
@@ -204,11 +206,25 @@ class EnrollmentServiceImplTest {
     @DisplayName("주어진 특강 식별자가 존재하지 않으면 찾을 수 없다는 예외를 반환한다.")
     void createWithNotExistedCourseId_throwsNotFoundException() {
         given(studentReader.getStudent(STUDENT_1_ID)).willReturn(student_1);
-        given(courseReader.getCourse(NOT_EXISTED_COURSE_ID)).willThrow(CourseNotFoundException.class);
+        given(courseReader.getCourse(NOT_EXISTED_COURSE_ID, COURSE_OPTION_1_ID))
+                .willThrow(CourseNotFoundException.class);
 
         assertThatThrownBy(
-                () -> enrollmentService.apply(NOT_EXISTED_COURSE_ID, STUDENT_1_ID)
+                () -> enrollmentService.apply(STUDENT_1_ID, NOT_EXISTED_COURSE_ID, COURSE_OPTION_1_ID)
         )
                 .isInstanceOf(CourseNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("주어진 특강 옵션 식별자가 존재하지 않으면 찾을 수 없다는 예외를 반환한다.")
+    void createWithNotExistedCourseOptionId_throwsNotFoundException() {
+        given(studentReader.getStudent(STUDENT_1_ID)).willReturn(student_1);
+        given(courseReader.getCourse(COURSE_1_ID, NOT_EXISTED_COURSE_OPTION_ID))
+                .willThrow(CourseOptionNotFoundException.class);
+
+        assertThatThrownBy(
+                () -> enrollmentService.apply(STUDENT_1_ID, COURSE_1_ID, NOT_EXISTED_COURSE_OPTION_ID)
+        )
+                .isInstanceOf(CourseOptionNotFoundException.class);
     }
 }

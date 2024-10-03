@@ -1,6 +1,7 @@
 package com.hanghe.enrollment.infrastructure.course;
 
 import com.hanghe.enrollment.common.exception.CourseNotFoundException;
+import com.hanghe.enrollment.common.exception.CourseOptionNotFoundException;
 import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.dto.CourseDto;
 import com.hanghe.enrollment.domain.course.option.CourseDate;
@@ -24,6 +25,20 @@ public class CourseReaderImpl implements CourseReader {
     public Course getCourse(Long courseId) {
         return courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException(courseId));
+    }
+
+    @Override
+    public Course getCourse(Long courseId, Long courseOptionId) {
+        Course course = getCourse(courseId);
+
+        CourseOption courseOption = course.getCourseOptions().stream()
+                .filter(option -> option.getId().equals(courseOptionId))
+                .findFirst()
+                .orElseThrow(() -> new CourseOptionNotFoundException(courseId));
+
+        course.setCourseOption(courseOption);
+
+        return course;
     }
 
     @Override

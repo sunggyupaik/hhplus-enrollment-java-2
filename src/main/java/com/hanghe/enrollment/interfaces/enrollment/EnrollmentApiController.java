@@ -18,11 +18,10 @@ public class EnrollmentApiController {
         return enrollmentFacade.listEnrollments(studentId);
     }
 
-    @PostMapping("/apply/course/{courseId}/student/{studentId}")
+    @PostMapping("/apply")
     public EnrollmentDto.Response createEnrollment(
-            @PathVariable("courseId") Long courseId,
-            @PathVariable("studentId") Long studentId
+            @RequestBody EnrollmentDto.applyRequest request
     ) {
-        return enrollmentFacade.createEnrollment(courseId, studentId);
+        return enrollmentFacade.createEnrollment(request);
     }
 }
