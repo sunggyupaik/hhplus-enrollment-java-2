@@ -1,9 +1,9 @@
 package com.hanghe.enrollment.domain.course;
 
-import com.hanghe.enrollment.domain.course.dto.CourseDateRequestDto;
+import com.hanghe.enrollment.domain.course.dto.CourseDto;
 
 import java.util.List;
 
 public interface CourseService {
-    List<Course> findAllByDate(CourseDateRequestDto request);
+    List<CourseDto.Response> list(CourseDto.CourseDateRequest request);
 }

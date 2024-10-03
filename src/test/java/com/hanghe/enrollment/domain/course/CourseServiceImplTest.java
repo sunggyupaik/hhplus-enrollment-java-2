@@ -1,9 +1,9 @@
 package com.hanghe.enrollment.domain.course;
 
-import com.hanghe.enrollment.domain.course.dto.CourseDateRequestDto;
+import com.hanghe.enrollment.domain.course.dto.CourseDto;
+import com.hanghe.enrollment.domain.course.dto.CourseDto.CourseDateRequest;
 import com.hanghe.enrollment.domain.user.UserInfo;
 import com.hanghe.enrollment.domain.user.professor.Professor;
-import com.hanghe.enrollment.infrastructure.course.JpaCourseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 
 class CourseServiceImplTest {
     private CourseService courseService;
-    private CourseRepository courseRepository;
+    private CourseReader courseReader;
 
     private static final Long PROFESSOR_1_ID = 10L;
     private static final String PROFESSOR_1_NAME = "강연자1";
@@ -43,7 +43,7 @@ class CourseServiceImplTest {
     private Professor professor_2;
     private UserInfo professorUserInfo_2;
 
-    private CourseDateRequestDto courseDateRequestDto;
+    private CourseDateRequest courseDateRequest;
     private CourseTime courseTime_1;
     private CourseDate courseDate_1;
     private Course course_1;
@@ -52,13 +52,13 @@ class CourseServiceImplTest {
     private CourseDate courseDate_2;
     private Course course_2;
 
-    private CourseDateRequestDto courseDateRequestDto_none;
+    private CourseDateRequest courseDateRequest_none;
     private CourseDate courseDate_none;
 
     @BeforeEach
     void setUp() {
-        courseRepository = mock(JpaCourseRepository.class);
-        courseService = new CourseServiceImpl(courseRepository);
+        courseReader = mock(CourseReader.class);
+        courseService = new CourseServiceImpl(courseReader);
 
         professorUserInfo_1 = UserInfo.builder()
                 .name(PROFESSOR_1_NAME)
@@ -82,7 +82,7 @@ class CourseServiceImplTest {
                 .userInfo(professorUserInfo_2)
                 .build();
 
-        courseDateRequestDto = CourseDateRequestDto.builder()
+        courseDateRequest = CourseDateRequest.builder()
                 .year(YEAR_2024)
                 .month(MONTH_10)
                 .day(DAY_31)
@@ -104,6 +104,7 @@ class CourseServiceImplTest {
         course_1 = Course.builder()
                 .id(COURSE_1_ID)
                 .title(COURSE_1_TITLE)
+                .courseDate(courseDate_1)
                 .courseTime(courseTime_1)
                 .professor(professor_1)
                 .build();
@@ -124,11 +125,12 @@ class CourseServiceImplTest {
         course_2 = Course.builder()
                 .id(COURSE_2_ID)
                 .title(COURSE_2_TITLE)
+                .courseDate(courseDate_2)
                 .courseTime(courseTime_2)
                 .professor(professor_2)
                 .build();
 
-        courseDateRequestDto_none = CourseDateRequestDto.builder()
+        courseDateRequest_none = CourseDateRequest.builder()
                 .year(9999)
                 .month(12)
                 .day(31)
@@ -144,19 +146,21 @@ class CourseServiceImplTest {
     @Test
     @DisplayName("주어진 특정 날짜로 특강 목록을 조회하여 반환한다")
     void listCoursesWithCourseDate() {
-        given(courseRepository.findAllByCourseDate(courseDate_1)).willReturn(List.of(course_1, course_2));
+        given(courseReader.getCourses(courseDate_1)).willReturn(List.of(course_1, course_2));
 
-        List<Course> courses = courseService.findAllByDate(courseDateRequestDto);
+        List<CourseDto.Response> courses = courseService.list(courseDateRequest);
 
         assertThat(courses).hasSize(2);
+        assertThat(courses.get(0).getId()).isEqualTo(COURSE_1_ID);
+        assertThat(courses.get(0).getProfessor().getId()).isEqualTo(PROFESSOR_1_ID);
     }
 
     @Test
     @DisplayName("주어진 특정 날짜에 특강이 없으면 빈 리스트를 반환한다.")
     void listEmptyCoursesWithNotExistedDate() {
-        given(courseRepository.findAllByCourseDate(courseDate_none)).willReturn(List.of());
+        given(courseReader.getCourses(courseDate_none)).willReturn(List.of());
 
-        List<Course> courses = courseService.findAllByDate(courseDateRequestDto_none);
+        List<CourseDto.Response> courses = courseService.list(courseDateRequest_none);
 
         assertThat(courses).hasSize(0);
     }

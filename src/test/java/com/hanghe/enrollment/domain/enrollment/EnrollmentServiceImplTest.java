@@ -6,7 +6,7 @@ import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseDate;
 import com.hanghe.enrollment.domain.course.CourseReader;
 import com.hanghe.enrollment.domain.course.CourseTime;
-import com.hanghe.enrollment.domain.course.dto.CourseDateRequestDto;
+import com.hanghe.enrollment.domain.course.dto.CourseDto.CourseDateRequest;
 import com.hanghe.enrollment.domain.enrollment.dto.EnrollmentDto;
 import com.hanghe.enrollment.domain.user.UserInfo;
 import com.hanghe.enrollment.domain.user.professor.Professor;
@@ -73,7 +73,7 @@ class EnrollmentServiceImplTest {
     private Professor professor_2;
     private UserInfo professorUserInfo_2;
 
-    private CourseDateRequestDto courseDateRequestDto;
+    private CourseDateRequest courseDateRequest;
     private CourseTime courseTime_1;
     private CourseDate courseDate_1;
     private Course course_1;
@@ -82,7 +82,7 @@ class EnrollmentServiceImplTest {
     private CourseDate courseDate_2;
     private Course course_2;
 
-    private CourseDateRequestDto courseDateRequestDto_none;
+    private CourseDateRequest courseDateRequest_none;
     private CourseDate courseDate_none;
 
     private Enrollment enrollment_1;
@@ -133,7 +133,7 @@ class EnrollmentServiceImplTest {
                 .userInfo(professorUserInfo_2)
                 .build();
 
-        courseDateRequestDto = CourseDateRequestDto.builder()
+        courseDateRequest = CourseDateRequest.builder()
                 .year(YEAR_2024)
                 .month(MONTH_10)
                 .day(DAY_31)
@@ -179,7 +179,7 @@ class EnrollmentServiceImplTest {
                 .professor(professor_2)
                 .build();
 
-        courseDateRequestDto_none = CourseDateRequestDto.builder()
+        courseDateRequest_none = CourseDateRequest.builder()
                 .year(9999)
                 .month(12)
                 .day(31)
