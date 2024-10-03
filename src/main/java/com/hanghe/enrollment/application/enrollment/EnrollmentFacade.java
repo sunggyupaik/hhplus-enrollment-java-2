@@ -16,7 +16,11 @@ public class EnrollmentFacade {
         return enrollmentService.getEnrollments(studentId);
     }
 
-    public EnrollmentDto.Response createEnrollment(Long courseId, Long studentId) {
-        return enrollmentService.apply(courseId, studentId);
+    public EnrollmentDto.Response createEnrollment(EnrollmentDto.applyRequest request) {
+        return enrollmentService.apply(
+                request.getStudentId(),
+                request.getCourseId(),
+                request.getCourseOptionId()
+        );
     }
 }

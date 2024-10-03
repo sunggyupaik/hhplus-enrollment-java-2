@@ -1,7 +1,9 @@
 package com.hanghe.enrollment.interfaces.enrollment;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hanghe.enrollment.application.enrollment.EnrollmentFacade;
 import com.hanghe.enrollment.common.exception.CourseNotFoundException;
+import com.hanghe.enrollment.common.exception.CourseOptionNotFoundException;
 import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseFixture;
 import com.hanghe.enrollment.domain.course.option.CourseDate;
@@ -28,7 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,6 +44,9 @@ class EnrollmentApiControllerTest {
 
     @MockBean
     private EnrollmentFacade enrollmentFacade;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private static final Long NOT_EXISTED_STUDENT_ID = 999L;
     private static final Long STUDENT_1_ID = 20L;
@@ -64,6 +69,7 @@ class EnrollmentApiControllerTest {
     private static final Integer DAY_31 = 31;
 
     private static final Long NOT_EXISTED_COURSE_ID = 998L;
+    private static final Long NOT_EXISTED_COURSE_OPTION_ID = 998L;
     private static final Long COURSE_1_ID = 1L;
     private static final Long COURSE_OPTION_1_ID = 50L;
     private static final String COURSE_1_TITLE = "코스1 특강";
@@ -177,22 +183,28 @@ class EnrollmentApiControllerTest {
     @DisplayName("createEnrollment 메서드는")
     class Describe_createEnrollment {
         @Nested
-        @DisplayName("존재하는 특강 식별자와 신청자 식별자가 주어진다면")
+        @DisplayName("존재하는 특강 식별자, 옵션 식별자, 신청자 식별자가 주어진다면")
         class Context_WithExistedCourseIdAndExistedStudentId {
+            private final Long EXISTED_STUDENT_ID = STUDENT_1_ID;
             private final Long EXISTED_COURSE_ID = COURSE_1_ID;
-            private final Long EXISTED_STUDY_ID = STUDENT_1_ID;
+            private final Long EXISTED_COURSE_OPTION_ID = COURSE_OPTION_1_ID;
+
+            private EnrollmentDto.applyRequest applyRequest = EnrollmentDto.applyRequest.builder()
+                    .studentId(EXISTED_STUDENT_ID)
+                    .courseId(EXISTED_COURSE_ID)
+                    .courseOptionId(EXISTED_COURSE_OPTION_ID)
+                    .build();
 
             @Test
             @DisplayName("특강 신청 내역을 생성하고 반환한다.")
             void itCreatesEnrollmentAndReturnsEnrollment() throws Exception {
-                given(enrollmentFacade.createEnrollment(EXISTED_COURSE_ID, EXISTED_STUDY_ID))
+                given(enrollmentFacade.createEnrollment(any(EnrollmentDto.applyRequest.class)))
                         .willReturn(EnrollmentDto.Response.of(enrollment_1));
 
                 mockMvc.perform(
-                                post("/api/enrollment/apply/course/{courseId}/student/{studentId}",
-                                        EXISTED_COURSE_ID, EXISTED_STUDY_ID
-                                )
+                                post("/api/enrollment/apply")
                                         .contentType(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(applyRequest))
                         )
                         .andExpect(status().isOk())
                         .andDo(print())
@@ -203,18 +215,47 @@ class EnrollmentApiControllerTest {
         @Nested
         @DisplayName("존재하지 않는 특강 식별자가 주어진다면")
         class Context_WithNotExistedCourseId {
-            private final Long EXISTED_STUDY_ID = STUDENT_1_ID;
+            private EnrollmentDto.applyRequest applyRequest = EnrollmentDto.applyRequest.builder()
+                    .studentId(STUDENT_1_ID)
+                    .courseId(NOT_EXISTED_COURSE_ID)
+                    .courseOptionId(COURSE_OPTION_1_ID)
+                    .build();
 
             @Test
             @DisplayName("특강을 찾을 수 없다는 예외를 반환한다.")
             void itThrowsNotFoundException() throws Exception {
-                given(enrollmentFacade.createEnrollment(eq(NOT_EXISTED_COURSE_ID), eq(EXISTED_STUDY_ID)))
+                given(enrollmentFacade.createEnrollment(any(EnrollmentDto.applyRequest.class)))
                         .willThrow(CourseNotFoundException.class);
 
                 mockMvc.perform(
-                                post("/api/enrollment/apply/course/{courseId}/student/{studentId}",
-                                        NOT_EXISTED_COURSE_ID, EXISTED_STUDY_ID
-                                )
+                                post("/api/enrollment/apply")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(applyRequest))
+                        )
+                        .andExpect(status().isBadRequest())
+                        .andDo(print());
+            }
+        }
+
+        @Nested
+        @DisplayName("존재하지 않는 특강 옵션 식별자가 주어진다면")
+        class Context_WithNotExistedCourseOptionId {
+            private EnrollmentDto.applyRequest applyRequest = EnrollmentDto.applyRequest.builder()
+                    .studentId(STUDENT_1_ID)
+                    .courseId(COURSE_1_ID)
+                    .courseOptionId(NOT_EXISTED_COURSE_OPTION_ID)
+                    .build();
+
+            @Test
+            @DisplayName("특강 옵션을 찾을 수 없다는 예외를 반환한다.")
+            void itThrowsNotFoundException() throws Exception {
+                given(enrollmentFacade.createEnrollment(any(EnrollmentDto.applyRequest.class)))
+                        .willThrow(CourseOptionNotFoundException.class);
+
+                mockMvc.perform(
+                                post("/api/enrollment/apply")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(applyRequest))
                         )
                         .andExpect(status().isBadRequest())
                         .andDo(print());
@@ -224,18 +265,22 @@ class EnrollmentApiControllerTest {
         @Nested
         @DisplayName("존재하지 않는 신청자 식별자가 주어진다면")
         class Context_WithNotExistedStudentId {
-            private final Long EXISTED_COURSE_ID = COURSE_1_ID;
+            private EnrollmentDto.applyRequest applyRequest = EnrollmentDto.applyRequest.builder()
+                    .studentId(NOT_EXISTED_STUDENT_ID)
+                    .courseId(COURSE_1_ID)
+                    .courseOptionId(COURSE_OPTION_1_ID)
+                    .build();
 
             @Test
             @DisplayName("특강을 찾을 수 없다는 예외를 반환한다.")
             void itThrowsNotFoundException() throws Exception {
-                given(enrollmentFacade.createEnrollment(eq(EXISTED_COURSE_ID), eq(NOT_EXISTED_STUDENT_ID)))
+                given(enrollmentFacade.createEnrollment(any(EnrollmentDto.applyRequest.class)))
                         .willThrow(CourseNotFoundException.class);
 
                 mockMvc.perform(
-                                post("/api/enrollment/apply/course/{courseId}/student/{studentId}",
-                                        EXISTED_COURSE_ID, NOT_EXISTED_STUDENT_ID
-                                )
+                                post("/api/enrollment/apply")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(applyRequest))
                         )
                         .andExpect(status().isBadRequest())
                         .andDo(print());

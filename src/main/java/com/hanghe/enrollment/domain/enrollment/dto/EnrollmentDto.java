@@ -7,16 +7,18 @@ import lombok.*;
 
 public class EnrollmentDto {
     @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor
     @ToString
     public static class applyRequest {
         private Long studentId;
         private Long courseId;
+        private Long courseOptionId;
 
         @Builder
-        public applyRequest(Long studentId, Long courseId) {
+        public applyRequest(Long studentId, Long courseId, Long courseOptionId) {
             this.studentId = studentId;
             this.courseId = courseId;
+            this.courseOptionId = courseOptionId;
         }
     }
 

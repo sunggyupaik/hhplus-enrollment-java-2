@@ -32,9 +32,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @Override
     @Transactional
-    public EnrollmentDto.Response apply(Long courseId, Long studentId) {
-        Course course = courseReader.getCourse(courseId);
+    public EnrollmentDto.Response apply(Long studentId, Long courseId, Long courseOptionId) {
         Student student = studentReader.getStudent(studentId);
+        Course course = courseReader.getCourse(courseId, courseOptionId);
 
         Enrollment enrollment = Enrollment.builder()
                 .course(course)
