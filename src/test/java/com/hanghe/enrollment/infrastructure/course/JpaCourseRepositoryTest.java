@@ -7,7 +7,7 @@ import com.hanghe.enrollment.domain.course.CourseTime;
 import com.hanghe.enrollment.domain.course.dto.CourseDateRequestDto;
 import com.hanghe.enrollment.domain.user.UserInfo;
 import com.hanghe.enrollment.domain.user.professor.Professor;
-import com.hanghe.enrollment.infrastructure.user.JpaProfessorRepository;
+import com.hanghe.enrollment.infrastructure.professor.JpaProfessorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
