@@ -239,7 +239,7 @@ class EnrollmentServiceImplTest {
         given(courseReader.getCourse(COURSE_1_ID)).willReturn(course_1);
         given(enrollmentStore.store(any(Enrollment.class))).willReturn(enrollment_1);
 
-        Enrollment createdEnrollment = enrollmentService.apply(applyRequest);
+        EnrollmentDto.Response createdEnrollment = enrollmentService.apply(COURSE_1_ID, STUDENT_1_ID);
 
         assertThat(createdEnrollment.getId()).isEqualTo(ENROLLMENT_1_ID);
         assertThat(createdEnrollment.getCourse().getId()).isEqualTo(COURSE_1_ID);
@@ -257,7 +257,7 @@ class EnrollmentServiceImplTest {
         given(studentReader.getStudent(NOT_EXISTED_STUDENT_ID)).willThrow(StudentNotFoundException.class);
 
         assertThatThrownBy(
-                () -> enrollmentService.apply(request)
+                () -> enrollmentService.apply(COURSE_1_ID, NOT_EXISTED_STUDENT_ID)
         )
                 .isInstanceOf(StudentNotFoundException.class);
     }
@@ -274,7 +274,7 @@ class EnrollmentServiceImplTest {
         given(courseReader.getCourse(NOT_EXISTED_COURSE_ID)).willThrow(CourseNotFoundException.class);
 
         assertThatThrownBy(
-                () -> enrollmentService.apply(request)
+                () -> enrollmentService.apply(NOT_EXISTED_COURSE_ID, STUDENT_1_ID)
         )
                 .isInstanceOf(CourseNotFoundException.class);
     }

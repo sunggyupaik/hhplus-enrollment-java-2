@@ -32,15 +32,16 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @Override
     @Transactional
-    public Enrollment apply(EnrollmentDto.applyRequest request) {
-        Student student = studentReader.getStudent(request.getStudentId());
-        Course course = courseReader.getCourse(request.getCourseId());
+    public EnrollmentDto.Response apply(Long courseId, Long studentId) {
+        Course course = courseReader.getCourse(courseId);
+        Student student = studentReader.getStudent(studentId);
 
         Enrollment enrollment = Enrollment.builder()
                 .course(course)
                 .student(student)
                 .build();
 
-        return enrollmentStore.store(enrollment);
+        Enrollment createdEnrollment = enrollmentStore.store(enrollment);
+        return EnrollmentDto.Response.of(createdEnrollment);
     }
 }

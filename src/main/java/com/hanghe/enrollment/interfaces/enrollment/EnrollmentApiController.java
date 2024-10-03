@@ -3,10 +3,7 @@ package com.hanghe.enrollment.interfaces.enrollment;
 import com.hanghe.enrollment.application.enrollment.EnrollmentFacade;
 import com.hanghe.enrollment.domain.enrollment.dto.EnrollmentDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,5 +16,10 @@ public class EnrollmentApiController {
     @GetMapping("/{id}")
     public List<EnrollmentDto.Response> listEnrollments(@PathVariable("id") Long studentId) {
         return enrollmentFacade.listEnrollments(studentId);
+    }
+
+    @PostMapping("/apply/course/{courseId}/student/{studentId}")
+    public EnrollmentDto.Response createEnrollment(@PathVariable Long courseId, @PathVariable Long studentId) {
+        return enrollmentFacade.createEnrollment(courseId, studentId);
     }
 }
