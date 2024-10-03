@@ -1,5 +1,6 @@
 package com.hanghe.enrollment.domain.enrollment;
 
+import com.hanghe.enrollment.common.exception.EnrollmentAlreadyExistsException;
 import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseReader;
 import com.hanghe.enrollment.domain.course.option.CourseOption;
@@ -40,6 +41,12 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         Course course = courseReader.getCourse(courseId);
         Student student = studentReader.getStudent(studentId);
         lockedCourseOption.increaseApplyCount();
+
+        boolean existsEnrollment = enrollmentReader.exists(studentId, courseId, courseOptionId);
+        System.out.println(existsEnrollment+"=existsEnrollment");
+        if (existsEnrollment) {
+            throw new EnrollmentAlreadyExistsException(studentId, courseId, courseOptionId);
+        }
 
         Enrollment enrollment = Enrollment.builder()
                 .course(course)

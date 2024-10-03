@@ -1,6 +1,7 @@
 package com.hanghe.enrollment.domain.enrollment;
 
 import com.hanghe.enrollment.common.exception.CourseApplyExceededException;
+import com.hanghe.enrollment.common.exception.EnrollmentAlreadyExistsException;
 import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseFixture;
 import com.hanghe.enrollment.domain.course.CourseRepository;
@@ -93,7 +94,7 @@ public class EnrollmentConcurrencyTest {
     }
 
     @Test
-    @DisplayName("서로 다른 사용자가 같은 특강을 40번 동시에 신청하면 10명은 실패한다.")
+    @DisplayName("서로 다른 신청자가 같은 특강을 40번 동시에 신청하면 10명은 실패한다.")
     void concurrentApplyForSameCourse40Times() throws InterruptedException {
         final int threadCount = 40;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
@@ -101,7 +102,7 @@ public class EnrollmentConcurrencyTest {
         AtomicInteger success = new AtomicInteger(0);
         AtomicInteger fail = new AtomicInteger(0);
 
-        for (int i = 1; i <= 40; i++) {
+        for (int i = 1; i <= threadCount; i++) {
             int finalI = i;
             executorService.submit(() -> {
                 try {
@@ -120,5 +121,34 @@ public class EnrollmentConcurrencyTest {
         assertThat(success.get()).isEqualTo(30);
         assertThat(fail.get()).isEqualTo(10);
         assertThat(enrollmentService.lists().size()).isEqualTo(30);
+    }
+
+    @Test
+    @DisplayName("동일한 신청자가 같은 특강을 5번 동시에 신청하면 1번 성공한다.")
+    void concurrentApplyForSameCourseForSameStudent5Times() throws InterruptedException {
+        final int threadCount = 5;
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        AtomicInteger success = new AtomicInteger(0);
+        AtomicInteger fail = new AtomicInteger(0);
+
+        for (int i = 1; i <= threadCount; i++) {
+            executorService.submit(() -> {
+                try {
+                    enrollmentService.apply(1L, 1L, 1L);
+                    success.incrementAndGet();
+                } catch (EnrollmentAlreadyExistsException e) {
+                    fail.incrementAndGet();
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+
+        assertThat(success.get()).isEqualTo(1);
+        assertThat(fail.get()).isEqualTo(4);
+        assertThat(enrollmentService.lists().size()).isEqualTo(1);
     }
 }
