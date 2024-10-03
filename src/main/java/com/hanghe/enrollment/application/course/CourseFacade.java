@@ -1,4 +1,4 @@
-package com.hanghe.enrollment.application;
+package com.hanghe.enrollment.application.course;
 
 import com.hanghe.enrollment.domain.course.CourseService;
 import com.hanghe.enrollment.domain.course.dto.CourseDto;

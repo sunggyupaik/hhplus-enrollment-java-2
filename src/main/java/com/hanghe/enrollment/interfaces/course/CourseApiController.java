@@ -1,6 +1,6 @@
 package com.hanghe.enrollment.interfaces.course;
 
-import com.hanghe.enrollment.application.CourseFacade;
+import com.hanghe.enrollment.application.course.CourseFacade;
 import com.hanghe.enrollment.domain.course.dto.CourseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
