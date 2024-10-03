@@ -1,5 +1,6 @@
 package com.hanghe.enrollment.domain.course.option;
 
+import com.hanghe.enrollment.common.exception.CourseApplyExceededException;
 import com.hanghe.enrollment.domain.course.Course;
 import jakarta.persistence.*;
 import lombok.*;
@@ -46,5 +47,12 @@ public class CourseOption {
 
     public void changeCourse(Course course) {
         this.course = course;
+    }
+
+    public void increaseApplyCount() {
+        applyCount++;
+        if (applyCount > MAX_APPLY) {
+            throw new CourseApplyExceededException(id);
+        }
     }
 }

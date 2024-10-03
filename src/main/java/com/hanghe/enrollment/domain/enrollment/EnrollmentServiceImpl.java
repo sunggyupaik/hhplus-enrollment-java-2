@@ -2,6 +2,8 @@ package com.hanghe.enrollment.domain.enrollment;
 
 import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseReader;
+import com.hanghe.enrollment.domain.course.option.CourseOption;
+import com.hanghe.enrollment.domain.course.option.CourseOptionReader;
 import com.hanghe.enrollment.domain.enrollment.dto.EnrollmentDto;
 import com.hanghe.enrollment.domain.user.student.Student;
 import com.hanghe.enrollment.domain.user.student.StudentReader;
@@ -18,6 +20,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final EnrollmentReader enrollmentReader;
     private final EnrollmentStore enrollmentStore;
     private final CourseReader courseReader;
+    private final CourseOptionReader courseOptionReader;
     private final StudentReader studentReader;
 
     @Override
@@ -33,8 +36,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     @Transactional
     public EnrollmentDto.Response apply(Long studentId, Long courseId, Long courseOptionId) {
+        CourseOption lockedCourseOption = courseOptionReader.getByIdForPessimistLock(courseId, courseOptionId);
+        Course course = courseReader.getCourse(courseId);
         Student student = studentReader.getStudent(studentId);
-        Course course = courseReader.getCourse(courseId, courseOptionId);
+        lockedCourseOption.increaseApplyCount();
 
         Enrollment enrollment = Enrollment.builder()
                 .course(course)
@@ -43,5 +48,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
         Enrollment createdEnrollment = enrollmentStore.store(enrollment);
         return EnrollmentDto.Response.of(createdEnrollment);
+    }
+
+    @Override
+    public List<Enrollment> lists() {
+        return enrollmentReader.lists();
     }
 }

@@ -7,9 +7,7 @@ import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseFixture;
 import com.hanghe.enrollment.domain.course.CourseReader;
 import com.hanghe.enrollment.domain.course.dto.CourseDto.CourseDateRequest;
-import com.hanghe.enrollment.domain.course.option.CourseDate;
-import com.hanghe.enrollment.domain.course.option.CourseOption;
-import com.hanghe.enrollment.domain.course.option.CourseTime;
+import com.hanghe.enrollment.domain.course.option.*;
 import com.hanghe.enrollment.domain.enrollment.dto.EnrollmentDto;
 import com.hanghe.enrollment.domain.user.UserInfo;
 import com.hanghe.enrollment.domain.user.UserInfoFixture;
@@ -33,6 +31,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -40,6 +39,7 @@ class EnrollmentServiceImplTest {
     private EnrollmentService enrollmentService;
     private EnrollmentReader enrollmentReader;
     private EnrollmentStore enrollmentStore;
+    private CourseOptionReader courseOptionReader;
     private CourseReader courseReader;
     private StudentReader studentReader;
 
@@ -107,9 +107,10 @@ class EnrollmentServiceImplTest {
         enrollmentReader = mock(EnrollmentReaderImpl.class);
         enrollmentStore = mock(EnrollmentStoreImpl.class);
         courseReader = mock(CourseReaderImpl.class);
+        courseOptionReader = mock(CourseOptionReader.class);
         studentReader = mock(StudentReaderImpl.class);
         enrollmentService = new EnrollmentServiceImpl(
-                enrollmentReader, enrollmentStore, courseReader,studentReader
+                enrollmentReader, enrollmentStore, courseReader, courseOptionReader, studentReader
         );
 
         studentUserInfo_1 = UserInfoFixture.createUserInfo(STUDENT_1_NAME, STUDENT_1_EMAIL, STUDENT_1_PHONE);
@@ -182,6 +183,7 @@ class EnrollmentServiceImplTest {
     void createWithExistedStudentIdAndExistedCourseId() {
         given(studentReader.getStudent(STUDENT_1_ID)).willReturn(student_1);
         given(courseReader.getCourse(COURSE_1_ID)).willReturn(course_1);
+        given(courseOptionReader.getByIdForPessimistLock(COURSE_1_ID, COURSE_OPTION_1_ID)).willReturn(courseOption_1);
         given(enrollmentStore.store(any(Enrollment.class))).willReturn(enrollment_1);
 
         EnrollmentDto.Response createdEnrollment = enrollmentService.apply(STUDENT_1_ID, COURSE_1_ID, COURSE_OPTION_1_ID);
@@ -206,7 +208,7 @@ class EnrollmentServiceImplTest {
     @DisplayName("주어진 특강 식별자가 존재하지 않으면 찾을 수 없다는 예외를 반환한다.")
     void createWithNotExistedCourseId_throwsNotFoundException() {
         given(studentReader.getStudent(STUDENT_1_ID)).willReturn(student_1);
-        given(courseReader.getCourse(NOT_EXISTED_COURSE_ID, COURSE_OPTION_1_ID))
+        given(courseReader.getCourse(eq(NOT_EXISTED_COURSE_ID)))
                 .willThrow(CourseNotFoundException.class);
 
         assertThatThrownBy(
@@ -219,7 +221,8 @@ class EnrollmentServiceImplTest {
     @DisplayName("주어진 특강 옵션 식별자가 존재하지 않으면 찾을 수 없다는 예외를 반환한다.")
     void createWithNotExistedCourseOptionId_throwsNotFoundException() {
         given(studentReader.getStudent(STUDENT_1_ID)).willReturn(student_1);
-        given(courseReader.getCourse(COURSE_1_ID, NOT_EXISTED_COURSE_OPTION_ID))
+        given(courseReader.getCourse(NOT_EXISTED_COURSE_ID)).willReturn(course_1);
+        given(courseOptionReader.getByIdForPessimistLock(COURSE_1_ID, NOT_EXISTED_COURSE_OPTION_ID))
                 .willThrow(CourseOptionNotFoundException.class);
 
         assertThatThrownBy(

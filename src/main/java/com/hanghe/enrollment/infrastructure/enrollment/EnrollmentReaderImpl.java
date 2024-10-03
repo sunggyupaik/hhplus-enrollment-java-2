@@ -17,4 +17,9 @@ public class EnrollmentReaderImpl implements EnrollmentReader {
     public List<Enrollment> getEnrollments(Long studentId) {
         return enrollmentRepository.findByStudentId(studentId);
     }
+
+    @Override
+    public List<Enrollment> lists() {
+        return enrollmentRepository.findAll();
+    }
 }

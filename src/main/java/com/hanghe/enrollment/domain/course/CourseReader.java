@@ -7,7 +7,9 @@ import java.util.List;
 
 public interface CourseReader {
     Course getCourse(Long courseId);
-
-    Course getCourse(Long courseId, Long courseOptionId);
     List<CourseDto.Response> getCourses(CourseDate courseDate);
+
+    Course getByIdForPessimistLock(Long courseId, Long courseOptionId);
+
+    Course getByIdForPessimistLock(Long courseId);
 }
