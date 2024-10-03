@@ -1,10 +1,12 @@
 package com.hanghe.enrollment.domain.course.dto;
 
 import com.hanghe.enrollment.domain.course.Course;
-import com.hanghe.enrollment.domain.course.CourseDate;
-import com.hanghe.enrollment.domain.course.CourseStatus;
+import com.hanghe.enrollment.domain.course.option.CourseDate;
+import com.hanghe.enrollment.domain.course.option.CourseOption;
 import com.hanghe.enrollment.domain.user.professor.Professor;
 import lombok.*;
+
+import java.util.List;
 
 public class CourseDto {
     @Getter
@@ -40,28 +42,14 @@ public class CourseDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class Response {
         private Long id;
-        private Integer year;
-        private Integer month;
-        private Integer day;
-        private Integer startTime;
-        private Integer startMinute;
-        private Integer endTime;
-        private Integer endMinute;
-        private CourseStatus status;
         private Professor professor;
+        private List<CourseOption> courseOptions;
 
-        public static Response of(Course course) {
+        public static Response of(Course course, List<CourseOption> courseOptions) {
             return Response.builder()
                     .id(course.getId())
-                    .year(course.getCourseDate().getYear())
-                    .month(course.getCourseDate().getMonth())
-                    .day(course.getCourseDate().getDay())
-                    .startTime(course.getCourseTime().getStartTime())
-                    .startMinute(course.getCourseTime().getStartMinute())
-                    .endTime(course.getCourseTime().getEndTime())
-                    .endMinute(course.getCourseTime().getEndMinute())
-                    .status(course.getStatus())
                     .professor(course.getProfessor())
+                    .courseOptions(courseOptions)
                     .build();
         }
     }

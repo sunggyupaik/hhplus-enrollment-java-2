@@ -1,6 +1,7 @@
 package com.hanghe.enrollment.domain.course;
 
 import com.hanghe.enrollment.common.BaseTimeEntity;
+import com.hanghe.enrollment.domain.course.option.CourseOption;
 import com.hanghe.enrollment.domain.enrollment.Enrollment;
 import com.hanghe.enrollment.domain.user.professor.Professor;
 import jakarta.persistence.*;
@@ -22,36 +23,31 @@ public class Course extends BaseTimeEntity {
 
     private String title;
 
-    @Embedded
-    private CourseDate courseDate;
-
-    @Embedded
-    private CourseTime courseTime;
-
-    @Enumerated(EnumType.STRING)
-    private CourseStatus status;
-
     @OneToMany(mappedBy = "course")
     @ToString.Exclude
     private List<Enrollment> enrollments = new ArrayList<>();
 
     @OneToOne
-    @JoinColumn(name="professor_id")
+    @JoinColumn(name = "professor_id")
     private Professor professor;
+
+    @OneToMany(mappedBy = "course")
+    @ToString.Exclude
+    private List<CourseOption> courseOptions = new ArrayList<>();
 
     @Builder
     public Course(
             Long id,
             String title,
-            CourseDate courseDate,
-            CourseTime courseTime,
             Professor professor
     ) {
         this.id = id;
         this.title = title;
-        this.courseDate = courseDate;
-        this.courseTime = courseTime;
-        this.status = CourseStatus.OPEN;
         this.professor = professor;
+    }
+
+    public void addCourseOption(CourseOption courseOption) {
+        this.courseOptions.add(courseOption);
+        courseOption.changeCourse(this);
     }
 }

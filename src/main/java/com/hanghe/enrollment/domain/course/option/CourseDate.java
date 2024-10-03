@@ -1,10 +1,7 @@
-package com.hanghe.enrollment.domain.course;
+package com.hanghe.enrollment.domain.course.option;
 
 import jakarta.persistence.Embeddable;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Objects;
 
@@ -12,6 +9,7 @@ import java.util.Objects;
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class CourseDate {
     private Integer year;
     private Integer month;
