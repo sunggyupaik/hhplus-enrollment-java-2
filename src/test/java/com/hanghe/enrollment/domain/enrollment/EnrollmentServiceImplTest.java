@@ -211,12 +211,22 @@ class EnrollmentServiceImplTest {
 
     @Test
     @DisplayName("주어진 신청자 식별자에 해당하는 신청 내역 목록을 조회하여 반환한다.")
-    void detailWithExistedStudentId() {
+    void getEnrollmentsWithExistedStudentId() {
         given(enrollmentReader.getEnrollments(STUDENT_1_ID)).willReturn(List.of(enrollment_1, enrollment_2));
 
         List<Enrollment> enrollments = enrollmentService.getEnrollments(STUDENT_1_ID);
 
         assertThat(enrollments).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("주어진 신청자 식별자에 해당하는 신청 내역이 없으면 빈 리스트를 반환한다.")
+    void getEnrollmentsWithNotExistedStudentId() {
+        given(enrollmentReader.getEnrollments(NOT_EXISTED_STUDENT_ID)).willReturn(List.of());
+
+        List<Enrollment> enrollments = enrollmentService.getEnrollments(NOT_EXISTED_STUDENT_ID);
+
+        assertThat(enrollments).hasSize(0);
     }
 
     @Test
