@@ -2,18 +2,23 @@ package com.hanghe.enrollment.domain.enrollment;
 
 import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseDate;
+import com.hanghe.enrollment.domain.course.CourseRepository;
 import com.hanghe.enrollment.domain.course.CourseTime;
 import com.hanghe.enrollment.domain.course.dto.CourseDateRequestDto;
 import com.hanghe.enrollment.domain.enrollment.dto.EnrollmentDto;
 import com.hanghe.enrollment.domain.user.UserInfo;
 import com.hanghe.enrollment.domain.user.professor.Professor;
 import com.hanghe.enrollment.domain.user.student.Student;
+import com.hanghe.enrollment.domain.user.student.StudentRepository;
+import com.hanghe.enrollment.infrastructure.course.JpaCourseRepository;
 import com.hanghe.enrollment.infrastructure.enrollment.JpaEnrollmentRepository;
+import com.hanghe.enrollment.infrastructure.student.JpaStudentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,6 +28,8 @@ import static org.mockito.Mockito.mock;
 class EnrollmentServiceImplTest {
     private EnrollmentService enrollmentService;
     private EnrollmentRepository enrollmentRepository;
+    private CourseRepository courseRepository;
+    private StudentRepository studentRepository;
 
     private static final Long STUDENT_1_ID = 20L;
     private static final String STUDENT_1_NAME = "신청자1";
@@ -79,7 +86,9 @@ class EnrollmentServiceImplTest {
     @BeforeEach
     void setUp() {
         enrollmentRepository = mock(JpaEnrollmentRepository.class);
-        enrollmentService = new EnrollmentServiceImpl(enrollmentRepository);
+        courseRepository = mock(JpaCourseRepository.class);
+        studentRepository = mock(JpaStudentRepository.class);
+        enrollmentService = new EnrollmentServiceImpl(enrollmentRepository, courseRepository, studentRepository);
 
         studentUserInfo_1 = UserInfo.builder()
                 .name(STUDENT_1_NAME)
@@ -187,7 +196,7 @@ class EnrollmentServiceImplTest {
 
         applyRequest = EnrollmentDto.applyRequest.builder()
                 .courseId(COURSE_1_ID)
-                .userId(STUDENT_1_ID)
+                .studentId(STUDENT_1_ID)
                 .build();
     }
 
@@ -204,6 +213,8 @@ class EnrollmentServiceImplTest {
     @Test
     @DisplayName("주어진 신청자 식별자와 강의 식별자로 신청 내역을 생성하고 반환한다.")
     void createWithExistedUserIdAndExistedCourseId() {
+        given(studentRepository.findById(STUDENT_1_ID)).willReturn(Optional.of(student_1));
+        given(courseRepository.findById(COURSE_1_ID)).willReturn(Optional.of(course_1));
         given(enrollmentRepository.save(any(Enrollment.class))).willReturn(enrollment_1);
 
         Enrollment createdEnrollment = enrollmentService.apply(applyRequest);
