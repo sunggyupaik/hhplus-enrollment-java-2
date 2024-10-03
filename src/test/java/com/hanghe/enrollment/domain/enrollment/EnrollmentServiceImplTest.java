@@ -2,6 +2,7 @@ package com.hanghe.enrollment.domain.enrollment;
 
 import com.hanghe.enrollment.common.exception.CourseNotFoundException;
 import com.hanghe.enrollment.common.exception.CourseOptionNotFoundException;
+import com.hanghe.enrollment.common.exception.EnrollmentAlreadyExistsException;
 import com.hanghe.enrollment.common.exception.StudentNotFoundException;
 import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseFixture;
@@ -230,5 +231,19 @@ class EnrollmentServiceImplTest {
                 () -> enrollmentService.apply(STUDENT_1_ID, COURSE_1_ID, NOT_EXISTED_COURSE_OPTION_ID)
         )
                 .isInstanceOf(CourseOptionNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("주어진 신청자, 특강, 특강 옵션 식별자에 해당하는 내역이 이미 존재하여 예외를 반환한다.")
+    void createWithExistedStudentIdAndExistedCourseIdAndExistedCourseOptionId_thenThrowsException() {
+        given(studentReader.getStudent(STUDENT_1_ID)).willReturn(student_1);
+        given(courseReader.getCourse(COURSE_1_ID)).willReturn(course_1);
+        given(courseOptionReader.getByIdForPessimistLock(COURSE_1_ID, COURSE_OPTION_1_ID)).willReturn(courseOption_1);
+        given(enrollmentReader.exists(STUDENT_1_ID, COURSE_1_ID, COURSE_OPTION_1_ID)).willReturn(true);
+
+        assertThatThrownBy(
+                () -> enrollmentService.apply(STUDENT_1_ID, COURSE_1_ID, COURSE_OPTION_1_ID)
+        )
+                .isInstanceOf(EnrollmentAlreadyExistsException.class);
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hanghe.enrollment.application.enrollment.EnrollmentFacade;
 import com.hanghe.enrollment.common.exception.CourseNotFoundException;
 import com.hanghe.enrollment.common.exception.CourseOptionNotFoundException;
+import com.hanghe.enrollment.common.exception.EnrollmentAlreadyExistsException;
 import com.hanghe.enrollment.domain.course.Course;
 import com.hanghe.enrollment.domain.course.CourseFixture;
 import com.hanghe.enrollment.domain.course.option.CourseDate;
@@ -276,6 +277,31 @@ class EnrollmentApiControllerTest {
             void itThrowsNotFoundException() throws Exception {
                 given(enrollmentFacade.createEnrollment(any(EnrollmentDto.applyRequest.class)))
                         .willThrow(CourseNotFoundException.class);
+
+                mockMvc.perform(
+                                post("/api/enrollment/apply")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(applyRequest))
+                        )
+                        .andExpect(status().isBadRequest())
+                        .andDo(print());
+            }
+        }
+
+        @Nested
+        @DisplayName("주어진 식별자에 해당하는 내역이 존재한다면")
+        class Context_WithExistedIds {
+            private EnrollmentDto.applyRequest applyRequest = EnrollmentDto.applyRequest.builder()
+                    .studentId(STUDENT_1_ID)
+                    .courseId(COURSE_1_ID)
+                    .courseOptionId(COURSE_OPTION_1_ID)
+                    .build();
+
+            @Test
+            @DisplayName("특강을 찾을 수 없다는 예외를 반환한다.")
+            void itThrowsNotFoundException() throws Exception {
+                given(enrollmentFacade.createEnrollment(any(EnrollmentDto.applyRequest.class)))
+                        .willThrow(EnrollmentAlreadyExistsException.class);
 
                 mockMvc.perform(
                                 post("/api/enrollment/apply")
