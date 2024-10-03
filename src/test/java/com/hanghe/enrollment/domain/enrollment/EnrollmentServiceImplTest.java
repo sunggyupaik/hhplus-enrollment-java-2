@@ -217,6 +217,9 @@ class EnrollmentServiceImplTest {
         List<Enrollment> enrollments = enrollmentService.getEnrollments(STUDENT_1_ID);
 
         assertThat(enrollments).hasSize(2);
+        assertThat(enrollments.get(0).getCourse().getId()).isEqualTo(COURSE_1_ID);
+        assertThat(enrollments.get(0).getStudent().getId()).isEqualTo(STUDENT_1_ID);
+        assertThat(enrollments.get(0).getCourse().getProfessor().getId()).isEqualTo(PROFESSOR_1_ID);
     }
 
     @Test
