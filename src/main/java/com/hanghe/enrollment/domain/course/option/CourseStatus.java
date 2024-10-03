@@ -1,4 +1,4 @@
-package com.hanghe.enrollment.domain.course;
+package com.hanghe.enrollment.domain.course.option;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,16 +1,14 @@
-package com.hanghe.enrollment.domain.course;
+package com.hanghe.enrollment.domain.course.option;
 
 import jakarta.persistence.Embeddable;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Objects;
 
 @Embeddable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class CourseTime {
     private Integer startTime;
     private Integer startMinute;
