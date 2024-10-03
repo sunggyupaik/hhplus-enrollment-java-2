@@ -7,5 +7,5 @@ import java.util.List;
 public interface EnrollmentService {
     List<EnrollmentDto.Response> getEnrollments(Long studentId);
 
-    Enrollment apply(EnrollmentDto.applyRequest request);
+    EnrollmentDto.Response apply(Long courseId, Long studentId);
 }

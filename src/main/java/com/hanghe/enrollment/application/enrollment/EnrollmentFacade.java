@@ -15,4 +15,8 @@ public class EnrollmentFacade {
     public List<EnrollmentDto.Response> listEnrollments(Long studentId) {
         return enrollmentService.getEnrollments(studentId);
     }
+
+    public EnrollmentDto.Response createEnrollment(Long courseId, Long studentId) {
+        return enrollmentService.apply(courseId, studentId);
+    }
 }
